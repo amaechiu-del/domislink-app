@@ -1,0 +1,29 @@
+services:
+  # BACKEND CONFIGURATION
+  - type: web
+    name: domislink-backend
+    runtime: node
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: node src/index.js
+    envVars:
+      - key: PORT
+        value: 10000
+    plan: free
+
+  # FRONTEND CONFIGURATION
+  - type: web
+    name: domislink-frontend
+    runtime: node
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: BACKEND_URL
+        fromService:
+          type: web
+          name: domislink-backend
+          property: url
+    plan: free
