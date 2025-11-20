@@ -1,29 +1,18 @@
 services:
-  # BACKEND CONFIGURATION
   - type: web
     name: domislink-backend
-    runtime: node
+    env: node
     rootDir: backend
     buildCommand: npm install
-    startCommand: node src/index.js
-    envVars:
-      - key: PORT
-        value: 10000
+    startCommand: npm start
     plan: free
+    autoDeploy: true
 
-  # FRONTEND CONFIGURATION
   - type: web
     name: domislink-frontend
-    runtime: node
+    env: static
     rootDir: frontend
     buildCommand: npm install && npm run build
-    startCommand: npm start
-    envVars:
-      - key: NODE_ENV
-        value: production
-      - key: BACKEND_URL
-        fromService:
-          type: web
-          name: domislink-backend
-          property: url
+    staticPublishPath: dist
     plan: free
+    autoDeploy: true
