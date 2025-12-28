@@ -1,0 +1,24 @@
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Dependencies
+node_modules/
+
+# Build
+dist/
+build/
+
+# Logs
+*.log
+
+# Coverage
+coverage/
+
+# IDE
+.idea/
+.vscode/
+
+# Vite
+*.local
