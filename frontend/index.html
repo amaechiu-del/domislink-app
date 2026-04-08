@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="DomisLink — A unified platform of intelligent tools for ecommerce, automation, analytics, content management, and more."
+    />
+    <meta property="og:title" content="DomisLink — Your Digital Ecosystem" />
+    <meta
+      property="og:description"
+      content="Explore 10 powerful apps built on the DomisLink platform."
+    />
+    <meta property="og:type" content="website" />
+    <meta name="theme-color" content="#6366f1" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔗</text></svg>" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <title>DomisLink — Your Digital Ecosystem</title>
+  </head>
+  <body>
+    <!-- Navbar -->
+    <header role="banner">
+      <nav class="navbar" aria-label="Main navigation">
+        <div class="container navbar-inner">
+          <a href="/" class="logo" aria-label="DomisLink home">
+            <div class="logo-icon" aria-hidden="true">🔗</div>
+            DomisLink
+          </a>
+          <span class="nav-badge">Platform</span>
+        </div>
+      </nav>
+    </header>
+
+    <main id="main-content">
+      <!-- Hero -->
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="container">
+          <div class="hero-tag" role="status">Live Platform</div>
+          <h1 class="hero-title" id="hero-title">
+            Your Digital<br />
+            <span class="gradient-text">Ecosystem</span>
+          </h1>
+          <p class="hero-description">
+            DomisLink brings together 10 powerful applications — from ecommerce
+            and AI automation to analytics and content management — all on one
+            interconnected platform.
+          </p>
+          <div class="hero-stats" role="list" aria-label="Platform stats">
+            <div class="stat" role="listitem">
+              <div class="stat-value">10</div>
+              <div class="stat-label">Apps &amp; Services</div>
+            </div>
+            <div class="stat" role="listitem">
+              <div class="stat-value">1</div>
+              <div class="stat-label">Unified Platform</div>
+            </div>
+            <div class="stat" role="listitem">
+              <div class="stat-value">∞</div>
+              <div class="stat-label">Possibilities</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Cards Section -->
+      <section class="section" aria-labelledby="apps-title">
+        <div class="container">
+          <div class="section-header">
+            <h2 class="section-title" id="apps-title">Explore the Platform</h2>
+            <p class="section-subtitle">
+              Click any card to visit the app. Each service is independently
+              deployed and ready to use.
+            </p>
+          </div>
+
+          <div
+            id="cards-grid"
+            class="cards-grid"
+            role="list"
+            aria-label="DomisLink applications"
+          ></div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer role="contentinfo">
+      <div class="footer">
+        <div class="container">
+          <div class="footer-logo" aria-hidden="true">🔗 DomisLink</div>
+          <p class="footer-text">
+            &copy; <span id="year"></span> DomisLink. All rights reserved. &nbsp;|&nbsp;
+            <a href="https://domislink.com">domislink.com</a>
+          </p>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      document.getElementById("year").textContent = new Date().getFullYear();
+    </script>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
