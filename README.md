@@ -16,7 +16,9 @@ One Link is the unified app directory and, over time, the identity gateway into 
 - Automated Node.js tests for preference validation, local persistence, de-duplication and recent-list limits.
 - Registry-driven product cards with explicit verification states.
 - Product detail dialogs with target audience, capabilities, product address, readiness note and source repository.
-- Responsive Account Centre with local profile preferences, notification settings, security/device status, connected-app overview, billing placeholder and privacy controls.
+- Responsive Account Centre with local profile preferences, security/device status, connected-app overview, billing placeholder and privacy controls.
+- Local message inbox with all/unread/security/updates filters, read controls and unread counter.
+- Delivery preference controls for email, WhatsApp, SMS and push notifications (local preview only).
 - Installable PWA that can be added to a phone or desktop home screen.
 - Native PWA manifest, install prompt and an offline shell.
 - Product and technical integration plan in `docs/ONE_LINK_FOUNDATION.md`.
