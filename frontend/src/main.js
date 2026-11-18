@@ -1,5 +1,6 @@
 import "./styles.css";
 import { subdomains, statusLabels } from "./data/subdomains.js";
+import { getAppDetails } from "./data/app-details.js";
 import {
   readAppPreferences,
   writeAppPreferences,
@@ -18,6 +19,7 @@ const emptyDescription = emptyState.querySelector("span");
 const year = document.querySelector("#year");
 const installButton = document.querySelector("#install-button");
 const installDialog = document.querySelector("#install-dialog");
+const detailDialog = document.querySelector("#app-detail-dialog");
 const appIds = subdomains.map((app) => app.id);
 let activeCategory = "All";
 let activeView = "all";
@@ -142,8 +144,59 @@ function createAppCard(app) {
     });
   }
   footer.append(domain, action);
-  article.append(top, category, heading, description, footer);
+  article.append(top, category, heading, description, detailButton, footer);
   return article;
+}
+
+
+function showAppDetails(appId) {
+  const app = subdomains.find((item) => item.id === appId);
+  if (!app) return;
+  const details = getAppDetails(app.id);
+  const canOpen = Boolean(app.url && app.status !== "planned");
+
+  const title = detailDialog.querySelector("#detail-title");
+  const category = detailDialog.querySelector("#detail-category");
+  const status = detailDialog.querySelector("#detail-status");
+  const tagline = detailDialog.querySelector("#detail-tagline");
+  const audience = detailDialog.querySelector("#detail-audience");
+  const featureList = detailDialog.querySelector("#detail-features");
+  const next = detailDialog.querySelector("#detail-next");
+  const openLink = detailDialog.querySelector("#detail-open");
+  const repoLink = detailDialog.querySelector("#detail-repo");
+
+  title.textContent = app.name;
+  category.textContent = app.category;
+  status.className = `status-pill status-${app.status}`;
+  status.textContent = statusLabels[app.status] ?? "Status unknown";
+  tagline.textContent = details.tagline;
+  audience.textContent = details.audience;
+  featureList.replaceChildren(...details.features.map((feature) => {
+    const item = document.createElement("li");
+    item.textContent = feature;
+    return item;
+  }));
+  next.textContent = details.next;
+
+  openLink.hidden = !canOpen;
+  if (canOpen) {
+    openLink.href = app.url;
+    openLink.onclick = () => {
+      preferences = recordRecentApp(preferences, app.id, appIds);
+      persistPreferences();
+    };
+  } else {
+    openLink.removeAttribute("href");
+    openLink.onclick = null;
+  }
+
+  repoLink.hidden = !app.repo;
+  if (app.repo) {
+    repoLink.href = `https://github.com/${app.repo}`;
+  } else {
+    repoLink.removeAttribute("href");
+  }
+  detailDialog.showModal();
 }
 
 function getViewApps() {
@@ -202,6 +255,7 @@ installButton.addEventListener("click", async () => {
   installDialog.showModal();
 });
 document.querySelector("#close-install-dialog").addEventListener("click", () => installDialog.close());
+document.querySelector("#close-detail-dialog").addEventListener("click", () => detailDialog.close());
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
