@@ -11,20 +11,22 @@ This directory contains the first Worker/D1 issuer implementation for `https://s
 - D1-backed identity, verified-email metadata, password hashes, OIDC clients, SSO sessions, authorization codes and audit events.
 - Password login to an HttpOnly, Secure, host-only `__Host-` SSO cookie.
 - Authorization-code endpoint with exact registered redirect URI matching, mandatory PKCE S256, required state and nonce, short-lived one-time codes.
-- Token exchange for public PKCE clients, RFC 7636 S256 challenge verification, one-time code consumption and RS256 ID token issuance.\n- Hashed opaque access-token persistence, expiry, revocation and a minimal `/oauth/userinfo` endpoint.\n- One-time, database-backed login CSRF tokens in addition to exact Origin checking.
+- Token exchange for public PKCE clients, RFC 7636 S256 challenge verification, one-time code consumption and RS256 ID token issuance.
+- Hashed opaque access-token persistence, expiry, revocation and a minimal `/oauth/userinfo` endpoint.
+- One-time, database-backed login CSRF tokens in addition to exact Origin checking.
 - Local SSO logout and health endpoint.
 
 ## Not yet implemented / not launch-ready
 
 - Confidential OIDC client authentication.
 - Refresh tokens, token introspection and broader access-token claims.
-- UserInfo, refresh tokens, token revocation endpoint and RP-initiated GET logout semantics.
+- Refresh tokens, token introspection and the full RP-initiated logout contract.
 - Self-service registration, email verification, password reset, MFA, WebAuthn/passkeys and Google identity federation.
 - Authenticated-device and recovery UX beyond the initial one-time login CSRF and Origin enforcement.
 - Rate limiting, bot protection, anomaly detection, audit retention/rotation, key rotation automation and complete protocol/security test suite.
 - Production D1 resource creation, custom domain, secret configuration and monitoring.
 
-**Relying applications must not use the current access token.** Treat this as an integration sandbox until access-token validation, client authentication, security controls and tests are completed. The issued ID token is also for protocol development only until an independent OIDC conformance and security review succeeds.
+**Relying applications must treat this as a development integration sandbox.** Access tokens are opaque, short-lived and intended for the provided UserInfo route only; the full client authentication, key, abuse-control, protocol and security review gates must pass before any production integration. The issued ID token is also for protocol development only until an independent OIDC conformance and security review succeeds.
 
 ## Setup
 
@@ -48,7 +50,7 @@ VALUES
  '["https://domislink.com/auth/callback"]',
  '["https://domislink.com/"]',
  '["https://domislink.com"]',
- '["openid","profile","email"]');
+ '["openid","email"]');
 ```
 
 Never use wildcards in redirect URIs or origins. Production clients must be reviewed individually.
