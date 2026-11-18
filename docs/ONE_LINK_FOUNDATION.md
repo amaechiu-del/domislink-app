@@ -234,3 +234,6 @@ Content is maintained in `frontend/src/data/app-details.js`, separate from rende
 - [x] Launch links suppressed for planned products.
 - [x] Unit tests for detail-record coverage and safe fallback.
 - [ ] Full Vite production build and browser verification after GitHub Actions runner startup issue is resolved.
+
+
+The detail dialog also displays the intended product address separately from the repository link. If no address is known, it explicitly displays “Production address not confirmed”; the presence of an address does not imply the endpoint is verified.
