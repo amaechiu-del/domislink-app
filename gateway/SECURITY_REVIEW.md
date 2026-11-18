@@ -1,6 +1,6 @@
 # Gateway security review — pre-production blockers
 
-- [ ] Replace the placeholder access token returned by `/oauth/token` with a verifiable JWT or a securely introspected opaque token. Do not integrate relying apps before this is done.
+- [ ] Add refresh-token rotation and introspection if long-lived sessions or non-browser API clients require them; current opaque access tokens are short-lived and checked by UserInfo.
 - [ ] Implement confidential-client authentication, including hashed client-secret storage and rotation.
 - [ ] Add explicit CSRF protection for login and logout forms; exact Origin checks are not a full CSRF defence by themselves.
 - [ ] Add rate limits on login, authorize and token routes, plus abuse monitoring.
