@@ -2,7 +2,7 @@ name: SSO Gateway CI
 
 on:
   pull_request:
-    branches: [main]
+    branches: [main, feature/one-link-unified-portal]
     paths:
       - "gateway/**"
       - ".github/workflows/sso-gateway-ci.yml"
