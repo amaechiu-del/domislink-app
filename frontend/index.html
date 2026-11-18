@@ -26,7 +26,7 @@
           <a class="nav-link" href="#apps">Explore apps</a>
           <a class="nav-link" href="#identity">One identity</a>
           <button id="install-button" class="install-button" type="button">Install app ↓</button>
-          <span class="signin-soon" aria-label="Single sign-on is being prepared">One sign-in · coming soon</span>
+          <button id="open-account" class="account-open-button" type="button">My account ↗</button><span class="signin-soon" aria-label="Single sign-on is being prepared">One sign-in · coming soon</span>
         </nav>
       </header>
 
@@ -67,7 +67,78 @@
           <p class="directory-note"><span aria-hidden="true">ⓘ</span> App destinations are listed for discovery. A “connection check pending” label means availability, sign-in and permissions have not yet been verified end to end.</p>
         </section>
 
-        <section class="identity-section" id="identity">
+
+        <section class="account-centre" id="account-centre" hidden aria-labelledby="account-heading">
+          <div class="account-topline">
+            <button id="close-account" class="account-back" type="button">← Back to apps</button>
+            <span class="account-preview-label">ACCOUNT CENTRE · PREVIEW MODE</span>
+          </div>
+          <div class="account-heading-row">
+            <div><div class="eyebrow">YOUR DOMISLINK IDENTITY</div><h1 id="account-heading">Account Centre</h1><p>Manage your profile, preferences and connected services from one place.</p></div>
+            <div class="account-status">SSO connection pending</div>
+          </div>
+          <div class="account-profile-banner">
+            <div id="account-avatar" class="account-avatar">DL</div>
+            <div><h2 id="account-greeting">Your DomisLink account</h2><p id="account-save-state">Local preview · not connected to SSO</p></div>
+            <span class="preview-pill">LOCAL PREVIEW</span>
+          </div>
+          <div class="account-layout">
+            <nav class="account-nav" aria-label="Account sections">
+              <button type="button" data-account-tab="profile" aria-current="page"><span>◉</span> Profile</button>
+              <button type="button" data-account-tab="security" aria-current="false"><span>▣</span> Security & devices</button>
+              <button type="button" data-account-tab="connected" aria-current="false"><span>⌘</span> Connected apps</button>
+              <button type="button" data-account-tab="notifications" aria-current="false"><span>♧</span> Notifications</button>
+              <button type="button" data-account-tab="billing" aria-current="false"><span>◇</span> Subscriptions & billing</button>
+              <button type="button" data-account-tab="privacy" aria-current="false"><span>◈</span> Privacy & data</button>
+            </nav>
+            <div class="account-content">
+              <section data-account-panel="profile" class="account-panel">
+                <div class="account-panel-heading"><div><h2>Personal profile</h2><p>These details stay in this browser in preview mode.</p></div><span class="panel-preview">LOCAL ONLY</span></div>
+                <form id="account-profile-form" class="account-form">
+                  <label>Display name<input id="account-display-name" name="displayName" maxlength="80" autocomplete="name" placeholder="Enter your display name"></label>
+                  <label>Email address<input id="account-email" name="email" type="email" maxlength="254" autocomplete="email" placeholder="you@example.com"></label>
+                  <label>Phone number<input id="account-phone" name="phone" type="tel" maxlength="32" autocomplete="tel" placeholder="+234…"></label>
+                  <div class="account-form-grid">
+                    <label>Language<select id="account-language"><option>English</option><option>French</option><option>Portuguese</option></select></label>
+                    <label>Time zone<select id="account-timezone"><option value="Africa/Lagos">Lagos (WAT)</option><option value="UTC">UTC</option><option value="Europe/London">London</option><option value="America/New_York">New York</option></select></label>
+                  </div>
+                  <div class="account-form-footer"><span>Profile data is not yet synced to an identity server.</span><button class="primary-action" type="submit">Save profile</button></div>
+                </form>
+              </section>
+              <section data-account-panel="security" class="account-panel" hidden>
+                <h2>Security & devices</h2><p class="account-subtitle">Your central DomisLink sign-in is not connected yet.</p>
+                <div class="account-info-card"><strong>Single sign-on</strong><span class="security-wait">Gateway integration pending</span><p>When SSO is released, you will manage passkeys, sign-in methods and verified recovery options here.</p></div>
+                <div class="account-info-card"><strong>This browser</strong><span class="security-wait">Local preview only</span><p>This page has not registered an authenticated device session. No remote sessions are available to revoke.</p></div>
+                <div class="account-info-card"><strong>Sign-in protection</strong><p>Passkeys, OTP, Google identity linking and session revocation will appear after the identity gateway passes security validation.</p></div>
+              </section>
+              <section data-account-panel="connected" class="account-panel" hidden>
+                <h2>Connected applications</h2><p class="account-subtitle">Your One Link product directory and account identity will be connected progressively.</p>
+                <ul id="connected-apps-list" class="connected-apps-list"></ul>
+              </section>
+              <section data-account-panel="notifications" class="account-panel" hidden>
+                <h2>Notification preferences</h2><p class="account-subtitle">Preview preferences are stored on this device. No messages are sent from this screen.</p>
+                <div class="account-toggle-row"><div><strong>Security notices</strong><p>Sign-in, account and security alerts</p></div><input id="notify-security" type="checkbox" checked></div>
+                <div class="account-toggle-row"><div><strong>Product updates</strong><p>New features and important product changes</p></div><input id="notify-product" type="checkbox" checked></div>
+                <div class="account-toggle-row"><div><strong>Announcements</strong><p>DomisLink news and service announcements</p></div><input id="notify-announcements" type="checkbox"></div>
+                <p id="notification-save-state" class="account-save-message">Changes save on this device.</p>
+              </section>
+              <section data-account-panel="billing" class="account-panel" hidden>
+                <h2>Subscriptions & billing</h2><p class="account-subtitle">A single view of eligible DomisLink subscriptions is planned.</p>
+                <div class="account-info-card"><strong>Payment connection</strong><span class="security-wait">Not connected</span><p>Paystack transactions, receipts, invoices and subscription renewals will appear here after verified account and payment integration.</p></div>
+                <div class="billing-empty"><span>◇</span><strong>No billing records in preview</strong><p>This preview does not access or invent payment history.</p></div>
+              </section>
+              <section data-account-panel="privacy" class="account-panel" hidden>
+                <h2>Privacy & data</h2><p class="account-subtitle">Understand what this preview stores on this device.</p>
+                <div class="account-info-card"><strong>Local profile preferences</strong><p>Display name, email, phone, language, time zone and notification preferences are saved in this browser only.</p></div>
+                <div class="account-info-card"><strong>What is not stored here</strong><p>Passwords, identity tokens, payment card data, authenticated sessions and private account records are not collected by this preview.</p></div>
+                <button id="reset-account-preview" class="danger-button" type="button">Reset local account preview</button>
+                <p id="privacy-reset-state" class="account-save-message">This only resets local Account Centre preview fields.</p>
+              </section>
+            </div>
+          </div>
+          <p class="account-disclaimer">Preview experience. This is not an authenticated account session. Changes made here are local to this browser and are not submitted to DomisLink servers.</p>
+        </section>
+\n        <section class="identity-section" id="identity">
           <div class="identity-icon">♛</div>
           <div><div class="eyebrow">ONE IDENTITY · MULTIPLE APPS</div><h2>One sign-in is the destination.</h2><p>The central identity gateway is being prepared. Until each app completes its SSO integration and security checks, use its current sign-in page. We will not claim a unified session is active before it is verified.</p></div>
           <span class="identity-status">SSO integration pending</span>
