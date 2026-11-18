@@ -4,11 +4,13 @@
   "description": "DomisLink public landing page",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "npm test && vite build",
     "preview": "vite preview",
-    "verify:apps": "node ../scripts/check-app-endpoints.mjs"
+    "verify:apps": "node ../scripts/check-app-endpoints.mjs",
+    "test": "node --test tests/*.test.mjs"
   },
   "devDependencies": {
     "vite": "^5.4.0"
-  }
+  },
+  "type": "module"
 }
