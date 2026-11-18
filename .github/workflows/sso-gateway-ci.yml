@@ -22,7 +22,7 @@ concurrency:
 jobs:
   typecheck:
     name: Typecheck SSO Worker
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: gateway
