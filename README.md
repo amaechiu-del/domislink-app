@@ -10,6 +10,10 @@ One Link is the unified app directory and, over time, the identity gateway into 
 
 - A polished mobile-first app directory using the DomisLink gold / dark visual identity.
 - Search and category filtering across the known DomisLink products.
+- Personal app launcher views for All Apps, Pinned and Recent.
+- Device-local pinned favourites and a six-app recent history; no account or sensitive data is stored there.
+- Status-aware launch controls that disable products still marked Preparing for launch.
+- Automated Node.js tests for preference validation, local persistence, de-duplication and recent-list limits.
 - Registry-driven product cards with explicit verification states.
 - Native PWA manifest, install prompt and an offline shell.
 - Product and technical integration plan in `docs/ONE_LINK_FOUNDATION.md`.
