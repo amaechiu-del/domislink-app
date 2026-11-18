@@ -211,3 +211,26 @@ Automated Node.js tests cover sanitization, invalid storage, persistence, pin/un
 - [ ] Full dependency install and Vite production build in GitHub Actions.
 - [ ] Browser test on desktop, Android and installed PWA.
 - [ ] Account-synchronised preferences after the central identity integration is production-ready.
+
+
+## 12. App detail experience milestone
+
+Every product card now opens an accessible native dialog with:
+- Product name, category and the existing readiness label.
+- A concise product promise and intended audience.
+- A structured list of key capabilities.
+- A product-specific readiness note, including unfinished work or post-event review.
+- A source-repository link where a repository is known.
+- An application launch link only where the product is not marked Preparing for launch and an address is registered.
+
+Content is maintained in `frontend/src/data/app-details.js`, separate from rendering logic and the URL/status registry. Unknown IDs receive a safe fallback detail record. The detail content is explanatory product information, not a claim that each listed capability is currently deployed.
+
+### Acceptance checklist
+- [x] Product detail content centralised for all registered products.
+- [x] Details action available on app cards.
+- [x] Accessible dialog title and close control.
+- [x] Capability, audience and readiness sections.
+- [x] Repository links only where a repository is registered.
+- [x] Launch links suppressed for planned products.
+- [x] Unit tests for detail-record coverage and safe fallback.
+- [ ] Full Vite production build and browser verification after GitHub Actions runner startup issue is resolved.
