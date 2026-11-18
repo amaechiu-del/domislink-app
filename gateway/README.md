@@ -11,7 +11,7 @@ This directory contains the first Worker/D1 issuer implementation for `https://s
 - D1-backed identity, verified-email metadata, password hashes, OIDC clients, SSO sessions, authorization codes and audit events.
 - Password login to an HttpOnly, Secure, host-only `__Host-` SSO cookie.
 - Authorization-code endpoint with exact registered redirect URI matching, mandatory PKCE S256, required state and nonce, short-lived one-time codes.
-- Token exchange for public PKCE clients, RFC 7636 S256 challenge verification, one-time code consumption and RS256 ID token issuance.
+- Token exchange for public PKCE clients and confidential clients using HTTP Basic client authentication, RFC 7636 S256 challenge verification, one-time code consumption and RS256 ID token issuance.
 - Hashed opaque access-token persistence, expiry, revocation and a minimal `/oauth/userinfo` endpoint.
 - One-time, database-backed login CSRF tokens in addition to exact Origin checking.
 - Local SSO logout and health endpoint.
@@ -40,7 +40,7 @@ This directory contains the first Worker/D1 issuer implementation for `https://s
 
 ## Register a public PKCE client
 
-Insert a client through a reviewed administrative operation. Example local/dev record (replace values):
+Insert clients through a reviewed administrative operation. Public SPA clients must have exact callback and origin values. Confidential server-side clients store only a SHA-256 hex digest of a high-entropy secret in `client_secret_hash`; send the original secret only through HTTP Basic authentication. Example public local/dev record:
 
 ```sql
 INSERT INTO oidc_clients
