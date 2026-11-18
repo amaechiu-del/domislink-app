@@ -416,7 +416,7 @@ for (const key of ["email","whatsapp","sms","push"]) {
   });
 }
 \ndocument.querySelector("#reset-account-preview").addEventListener("click", () => {
-  accountData = { ...DEFAULT_ACCOUNT, notifications: { ...DEFAULT_ACCOUNT.notifications } };
+  accountData = { ...DEFAULT_ACCOUNT, channels: { ...DEFAULT_ACCOUNT.channels }, notifications: { ...DEFAULT_ACCOUNT.notifications } };
   saveAccount(accountStorage,accountData);
   renderAccountCentre();
   document.querySelector("#privacy-reset-state").textContent = "Local account preview data reset";
