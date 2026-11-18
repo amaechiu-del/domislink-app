@@ -1,0 +1,5 @@
+# Copy to .dev.vars for local development only. Do not commit .dev.vars.
+# Use a locally generated PKCS#8 RSA private key and a random KID.
+OIDC_SIGNING_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nREPLACE_WITH_LOCAL_KEY_MATERIAL\n-----END PRIVATE KEY-----"
+OIDC_SIGNING_KID="local-dev-kid"
+LOGIN_ALLOWED_ORIGINS='["http://localhost:5173"]'
