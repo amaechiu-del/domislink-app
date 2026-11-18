@@ -3,9 +3,24 @@
 **Issuer target:** `https://sso.domislink.com`  
 **Protocol:** OpenID Connect (OIDC), OAuth 2.0 Authorization Code Flow with PKCE (S256)  
 **Identity RP ID target:** `domislink.com` for passkeys used on that domain  
-**Status:** Architecture prepared; gateway repository and deployed issuer not located in the connected GitHub inventories reviewed on 18 November 2026.
+**Status:** Church already contains a substantially more complete SSO implementation in `amaechiu-del/domislink-church/services/sso/` on unmerged feature branches. See [Product Integration Contract](PRODUCT_INTEGRATION_CONTRACT.md). The small `gateway/` prototype in this repository is non-canonical and must not be deployed. The Church SSO candidate is not yet production-verified.
 
-## 1. Existing evidence
+## 1. Existing canonical candidate discovered
+
+A source review of `amaechiu-del/domislink-church` found:
+- Dedicated Worker at `services/sso/`, intended for `https://sso.domislink.com`.
+- OIDC discovery, RS256 JWKS, Authorization Code + PKCE S256, rotating refresh tokens, UserInfo and revocation.
+- Client helper with state/nonce/PKCE and cryptographic ID-token signature validation.
+- Email/phone OTP, WebAuthn passkeys and password-recovery modules.
+- Existing Church relying-party callback/exchange adapter on an SSO feature branch.
+- Shared `platform_tenants` and `platform_tenant_memberships` D1 registry, with Church membership synchronization triggers and a protected product-tenant registration endpoint.
+- Church client `domislink-church-web` and exact callback `https://church.domislink.com/sso/callback`.
+
+The source is on large unmerged branches (`feature/universal-sso-whatsapp-gateway` and `fix/sso-oauth-security-hardening`), not the inspected `main` branch. The SSO repository's release-gate document explicitly requires deployed Worker parity, secret inventory, read-only migration review, D1 backup, isolated protocol/security tests and rollback planning. No production migration or deploy is authorised by this discovery.
+
+**Decision:** reuse and reconcile the Church `services/sso/` candidate rather than build a second issuer in this One Link repository. One Link becomes a relying-party PWA and account hub. Each app keeps its own local session and tenant/role authorization. The prior generic `gateway/` directory is a sandbox prototype only.
+
+## 2. Existing evidence
 
 ### Church Management
 
@@ -24,7 +39,7 @@ This is a useful local-session and tenant-authorization foundation. The inspecte
 
 A search for the SSO gateway repository name and related descriptions returned no repository in the connected `amaechiu-del` or `domislinkint` GitHub account inventories. Code searches for `sso.domislink.com` and common OIDC terms also returned no matching source files in the searched default branches. This means the gateway source was not located through those connected accounts; it does not prove that no other account, workspace or private system contains it.
 
-## 2. Non-negotiable design
+## 3. Non-negotiable design
 
 - OIDC authenticates a person; it does not grant church/business tenant permissions.
 - Every relying application continues enforcing its own membership, role, branch, subscription and object-level authorization.
@@ -35,7 +50,7 @@ A search for the SSO gateway repository name and related descriptions returned n
 - Do not silently link accounts just because two records contain the same unverified email address.
 - All redirect URIs, post-logout redirects, origins, client IDs and allowed scopes must be registered and exact-match validated.
 
-## 3. Browser sign-in sequence
+## 4. Browser sign-in sequence
 
 1. A user selects “Continue with DomisLink” in an application.
 2. The application backend creates a cryptographically random `state`, `nonce` and PKCE verifier/challenge pair, stores the transaction server-side, and redirects to the issuer's authorization endpoint.
@@ -46,7 +61,7 @@ A search for the SSO gateway repository name and related descriptions returned n
 7. The application maps the stable issuer subject (`iss + sub`) to an app-local identity. Account linking requires an explicit, authenticated linking process.
 8. The application creates its existing first-party session cookie and continues to evaluate its local tenant permissions on every protected request.
 
-## 4. Proposed issuer endpoints
+## 5. Existing issuer endpoint contract
 
 | Endpoint | Purpose |
 |---|---|
@@ -60,9 +75,9 @@ A search for the SSO gateway repository name and related descriptions returned n
 | `/health` | Non-sensitive service health |
 | `/admin/clients` | Restricted client registration/management; not public self-service initially |
 
-The exact endpoint names and claims must be finalized in an issuer implementation and its discovery document. These names are the intended interface contract, not evidence that an issuer currently serves them.
+The Church SSO candidate currently publishes `/.well-known/openid-configuration`, `/oauth/authorize`, `/oauth/token`, `/oauth/userinfo`, `/oauth/jwks` and `/oauth/revoke`. Verify the deployed discovery document and behavior against the actual Worker version before connecting clients.
 
-## 5. Proposed D1 data model
+## 6. Shared data model already present
 
 These are logical entities for design review; no migration is applied by this document.
 
@@ -78,7 +93,7 @@ These are logical entities for design review; no migration is applied by this do
 
 Secrets and private signing keys belong in managed secret storage, not D1 plaintext columns, repository files or frontend bundles. Signing keys require rotation and a JWKS overlap period.
 
-## 6. Church Management pilot adapter
+## 7. One Link relying-party adapter
 
 1. Add a server-side OIDC client configuration for the Church Worker.
 2. Implement login-start and callback routes with PKCE, state and nonce held server-side.
@@ -91,7 +106,7 @@ Secrets and private signing keys belong in managed secret storage, not D1 plaint
 
 Do not put central issuer signing keys into the Church Worker. The Church app needs issuer public keys/JWKS and its own registered client credentials only where a confidential-client exchange requires them.
 
-## 7. Security and test acceptance
+## 8. Security and test acceptance
 
 - Authorization request: exact redirect URI and client validation; PKCE S256 mandatory; state and nonce required.
 - Callback: reject missing, mismatched, expired and replayed state, nonce or authorization code.
@@ -104,7 +119,7 @@ Do not put central issuer signing keys into the Church Worker. The Church app ne
 - Abuse protections: rate limits, CSRF controls, origin validation, audit logging and anomaly monitoring.
 - Availability: gateway outage does not silently bypass app authentication; apps fail closed for new SSO logins and preserve only appropriately bounded existing local sessions.
 
-## 8. Delivery plan
+## 9. Delivery plan
 
 | Phase | Work | Exit evidence |
 |---|---|---|
@@ -116,7 +131,7 @@ Do not put central issuer signing keys into the Church Worker. The Church app ne
 | SSO-5 | Add passkeys / WebAuthn and upstream Google identity | Recovery, origin/RP ID, device revocation and linking tests pass |
 | SSO-6 | Production rollout | Protected main deployment, monitoring, key rotation and rollback proven |
 
-## 9. Immediate blocking items
+## 10. Immediate blocking items
 
 1. Confirm whether the earlier `domislink-sso-gateway` project lives under another GitHub account or workspace; it was not visible in the two connected account inventories checked.
 2. If no source exists, create a dedicated gateway repository using the Cloudflare Workers + D1 architecture, with production deployment withheld until the issuer security tests pass.
