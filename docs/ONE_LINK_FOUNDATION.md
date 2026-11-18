@@ -269,3 +269,21 @@ The PWA manifest has been updated for the combined app launcher and Account Cent
 - [ ] Connect actual notification preferences to server-side delivery.
 - [ ] Connect Paystack subscriptions and transaction ledger through verified APIs.
 - [ ] Browser test and full PWA build after Actions runner issue is resolved.
+
+
+## 14. Message Centre milestone
+
+The Account Centre's Notifications section now includes a local preview inbox with example notices for product, security and general announcements. Visitors can filter all/unread/security/updates, mark individual notices as read and mark all notices read. Read status is validated against known notice IDs and persisted in the browser only.
+
+Delivery preference controls now cover Email, WhatsApp, SMS and Push. These are local preferences only and do not send messages or subscribe the browser to push delivery. The UI explicitly says the delivery integrations and cross-device synchronisation are pending.
+
+### Message Centre acceptance
+- [x] Example inbox with a clear preview-only warning.
+- [x] All, unread, security and updates filters.
+- [x] Individual and bulk mark-as-read controls.
+- [x] Unread count and empty-filter state.
+- [x] Safe local persistence of read state.
+- [x] Email, WhatsApp, SMS and push preference controls.
+- [ ] Connect to server-backed notifications and user delivery preferences after SSO.
+- [ ] Integrate actual Web Push subscription and permission flow.
+- [ ] Integrate WhatsApp Cloud API, Termii SMS and email provider delivery receipts.
