@@ -237,3 +237,35 @@ Content is maintained in `frontend/src/data/app-details.js`, separate from rende
 
 
 The detail dialog also displays the intended product address separately from the repository link. If no address is known, it explicitly displays “Production address not confirmed”; the presence of an address does not imply the endpoint is verified.
+
+
+## 13. Account Centre milestone
+
+The One Link PWA now includes a responsive Account Centre surface with six sections: Profile, Security & devices, Connected apps, Notifications, Subscriptions & billing, and Privacy & data.
+
+The current Account Centre is **preview mode**:
+- Profile display name, email, phone, language and time zone can be edited and stored in this browser only.
+- Notification preferences can be changed locally; this screen does not send messages.
+- Security/device status explicitly says that there is no authenticated SSO session registered in this preview.
+- Connected apps list the product registry and show that apps are not yet linked to the central account.
+- Billing shows no records rather than inventing Paystack transactions.
+- Privacy explains the exact local fields saved and provides a reset action.
+
+The local account-preferences module allowlists fields and excludes passwords, tokens, payment details and arbitrary properties. It validates language/time-zone choices and safely handles malformed or unavailable browser storage.
+
+The PWA manifest has been updated for the combined app launcher and Account Centre; the service-worker cache name is bumped so installed clients refresh the app shell.
+
+### Account Centre acceptance checklist
+- [x] Profile form and local persistence.
+- [x] Security/device status with no false authenticated-session claim.
+- [x] Connected-app registry overview.
+- [x] Local notification preferences.
+- [x] Billing placeholder with no fabricated history.
+- [x] Privacy explanation and local preview reset.
+- [x] Responsive desktop/mobile account navigation.
+- [x] Account preference validation tests.
+- [ ] Connect real account profile after OIDC issuer and relying-party integration passes.
+- [ ] Implement authenticated session/device listing and revocation.
+- [ ] Connect actual notification preferences to server-side delivery.
+- [ ] Connect Paystack subscriptions and transaction ledger through verified APIs.
+- [ ] Browser test and full PWA build after Actions runner issue is resolved.
