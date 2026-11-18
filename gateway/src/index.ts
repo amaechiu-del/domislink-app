@@ -93,6 +93,23 @@ function parseArray(value: string, fallback: string[]): string[] {
   try { const parsed = JSON.parse(value); return Array.isArray(parsed) ? parsed.filter((v) => typeof v === "string") : fallback; }
   catch { return fallback; }
 }
+function corsHeaders(origin: string) {
+  return {
+    "Access-Control-Allow-Origin": origin,
+    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+    "Access-Control-Allow-Headers": "Authorization, Content-Type",
+    "Access-Control-Max-Age": "600",
+    "Vary": "Origin"
+  };
+}
+async function allowedClientOrigin(env: Env, origin: string, clientId?: string): Promise<boolean> {
+  if (clientId) {
+    const client = await getClient(env, clientId);
+    return Boolean(client && parseArray((client as ClientRow & {allowed_origins_json:string}).allowed_origins_json, []).includes(origin));
+  }
+  const rows = await env.DB.prepare("SELECT allowed_origins_json FROM oidc_clients WHERE status='active'").all<{allowed_origins_json:string}>();
+  return (rows.results ?? []).some(row => parseArray(row.allowed_origins_json, []).includes(origin));
+}
 async function getSession(request: Request, env: Env): Promise<SessionRow | null> {
   const raw = readCookie(request);
   if (!raw) return null;
@@ -145,6 +162,12 @@ export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
     const method = request.method;
+
+    if (method === "OPTIONS" && (url.pathname === "/oauth/token" || url.pathname === "/oauth/userinfo")) {
+      const origin = request.headers.get("Origin") ?? "";
+      if (!origin || !(await allowedClientOrigin(env,origin))) return json({error:"origin_not_allowed"},403);
+      return new Response(null,{status:204,headers:corsHeaders(origin)});
+    }
 
     if (method === "GET" && url.pathname === "/health") {
       try { await env.DB.prepare("SELECT 1").first(); return json({ ok:true, service:"domislink-sso-gateway", environment:env.APP_ENV }); }
@@ -258,6 +281,9 @@ export default {
       const clientId = String(form.get("client_id") ?? "");
       const client = await getClient(env,clientId);
       if (!client || grantType !== "authorization_code") return json({error:"invalid_client_or_grant"},400);
+      const origin = request.headers.get("Origin");
+      if (origin && !parseArray((client as ClientRow & {allowed_origins_json:string}).allowed_origins_json, []).includes(origin)) return json({error:"origin_not_allowed"},403);
+      const cors = origin ? corsHeaders(origin) : {};
       if (client.client_type === "confidential") return json({error:"confidential_client_authentication_not_configured"},401);
       const code = String(form.get("code") ?? "");
       const redirectUri = String(form.get("redirect_uri") ?? "");
@@ -281,7 +307,7 @@ export default {
       await env.DB.prepare("INSERT INTO access_tokens (id,token_hash,identity_id,client_id,scope,expires_at) VALUES (?,?,?,?,?,?)")
         .bind(crypto.randomUUID(),await sha256(accessToken),codeRow.identity_id,clientId,codeRow.scope,new Date(Date.now()+accessTtl*1000).toISOString()).run();
       await audit(env,"token_exchange","success",codeRow.identity_id,clientId);
-      return json({access_token:accessToken,token_type:"Bearer",expires_in:accessTtl,id_token:idToken,scope:codeRow.scope});
+      return json({access_token:accessToken,token_type:"Bearer",expires_in:accessTtl,id_token:idToken,scope:codeRow.scope},200,cors);
     }
 
     if (method === "GET" && url.pathname === "/oauth/userinfo") {
@@ -292,6 +318,9 @@ export default {
       const token = await env.DB.prepare("SELECT identity_id,client_id,scope FROM access_tokens WHERE token_hash=? AND revoked_at IS NULL AND expires_at>? LIMIT 1")
         .bind(tokenHash,new Date().toISOString()).first<{identity_id:string;client_id:string;scope:string}>();
       if (!token) return json({error:"invalid_token"},401,{"WWW-Authenticate":"Bearer"});
+      const origin = request.headers.get("Origin");
+      if (origin && !(await allowedClientOrigin(env,origin,token.client_id))) return json({error:"origin_not_allowed"},403);
+      const cors = origin ? corsHeaders(origin) : {};
       const scopes = token.scope.split(/\\s+/);
       const claims: Record<string,unknown> = {sub:token.identity_id};
       if (scopes.includes("email")) {
