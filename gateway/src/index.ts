@@ -153,7 +153,7 @@ export default {
         grant_types_supported:["authorization_code"],
         subject_types_supported:["public"],
         id_token_signing_alg_values_supported:["RS256"],
-        token_endpoint_auth_methods_supported:["none","client_secret_basic"],
+        token_endpoint_auth_methods_supported:["none"],
         code_challenge_methods_supported:["S256"],
         scopes_supported:DEFAULT_SCOPES,
         claims_supported:["iss","sub","aud","exp","iat","nonce","email","email_verified"]
@@ -251,14 +251,16 @@ export default {
       const redirectUri = String(form.get("redirect_uri") ?? "");
       const verifier = String(form.get("code_verifier") ?? "");
       if (!/^[A-Za-z0-9._~-]{43,128}$/.test(verifier) || !code) return json({error:"invalid_grant"},400);
-      const codeRow = await env.DB.prepare(`UPDATE authorization_codes SET consumed_at=?
-        WHERE code_hash=? AND client_id=? AND redirect_uri=? AND consumed_at IS NULL AND expires_at>?
-        RETURNING client_id,identity_id,redirect_uri,scope,nonce,code_challenge,code_challenge_method`)
-        .bind(new Date().toISOString(),await sha256(code),clientId,redirectUri,new Date().toISOString()).first<CodeRow>();
-      if (!codeRow || !safeEqual(await sha256(verifier),codeRow.code_challenge)) {
+      const candidate = await env.DB.prepare(`SELECT id,client_id,identity_id,redirect_uri,scope,nonce,code_challenge,code_challenge_method
+        FROM authorization_codes WHERE code_hash=? AND client_id=? AND redirect_uri=? AND consumed_at IS NULL AND expires_at>? LIMIT 1`)
+        .bind(await sha256(code),clientId,redirectUri,new Date().toISOString()).first<CodeRow & {id:string}>();
+      if (!candidate || candidate.code_challenge_method !== "S256" || !safeEqual(await sha256(verifier),candidate.code_challenge)) {
         await audit(env,"token_exchange","denied",undefined,clientId);
         return json({error:"invalid_grant"},400);
       }
+      const codeRow = await env.DB.prepare("UPDATE authorization_codes SET consumed_at=? WHERE id=? AND consumed_at IS NULL AND expires_at>? RETURNING client_id,identity_id,redirect_uri,scope,nonce,code_challenge,code_challenge_method")
+        .bind(new Date().toISOString(),candidate.id,new Date().toISOString()).first<CodeRow>();
+      if (!codeRow) return json({error:"invalid_grant"},400);
       const identity = await env.DB.prepare("SELECT status FROM identities WHERE id=?").bind(codeRow.identity_id).first<{status:string}>();
       if (identity?.status !== "active") return json({error:"invalid_grant"},400);
       const idToken = await issueIdToken(env,codeRow.identity_id,clientId,codeRow.nonce,codeRow.scope.split(" "));
