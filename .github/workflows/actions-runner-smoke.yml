@@ -1,0 +1,27 @@
+name: Actions Runner Smoke Test
+
+on:
+  push:
+    branches: [feature/one-link-unified-portal]
+    paths:
+      - ".github/workflows/actions-runner-smoke.yml"
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: actions-runner-smoke
+  cancel-in-progress: true
+
+jobs:
+  runner-smoke:
+    name: Runner provisioning probe
+    runs-on: ubuntu-24.04
+    timeout-minutes: 3
+    steps:
+      - name: Confirm runner starts
+        run: |
+          echo "Runner started successfully"
+          echo "OS: $(uname -a)"
+          echo "Node: $(node --version)"
+          echo "NPM: $(npm --version)"
