@@ -1,0 +1,37 @@
+name: SSO Gateway CI
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "gateway/**"
+      - ".github/workflows/sso-gateway-ci.yml"
+  push:
+    branches: [feature/sso-gateway-worker-foundation]
+    paths:
+      - "gateway/**"
+      - ".github/workflows/sso-gateway-ci.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sso-gateway-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  typecheck:
+    name: Typecheck SSO Worker
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: gateway
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund --no-package-lock
+      - name: Typecheck Worker
+        run: npm run typecheck
