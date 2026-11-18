@@ -2,12 +2,12 @@
 
 - [ ] Add refresh-token rotation and introspection if long-lived sessions or non-browser API clients require them; current opaque access tokens are short-lived and checked by UserInfo.
 - [ ] Implement confidential-client authentication, including hashed client-secret storage and rotation.
-- [ ] Add explicit CSRF protection for login and logout forms; exact Origin checks are not a full CSRF defence by themselves.
+- [ ] Review the one-time database-backed login CSRF flow and add explicit CSRF protection to any future state-changing browser forms; protect logout against cross-site requests and verify same-site behavior.
 - [ ] Add rate limits on login, authorize and token routes, plus abuse monitoring.
 - [ ] Add full OIDC validation tests: PKCE, state, nonce, exact redirect matching, code replay, audience, issuer, key rotation, expiry and algorithm rejection.
 - [ ] Confirm `jose` key-import/JWKS interoperability in the Workers runtime and use a stable, reviewed key-management procedure.
-- [ ] Implement UserInfo only with a well-defined minimal claims policy.
-- [ ] Implement a complete logout contract and session revocation propagation for relying parties.
+- [ ] Review UserInfo claims disclosure, access-token client binding and CORS policy with negative tests.
+- [ ] Implement the complete RP-initiated logout contract and session revocation propagation for relying parties.
 - [ ] Review authorization-code one-time consumption and transaction consistency under concurrent exchanges.
 - [ ] Add email verification, recovery and account linking before user onboarding.
 - [ ] Add WebAuthn/passkey origin and RP-ID validation, replay protection, device removal and recovery.
