@@ -130,3 +130,46 @@ A card being visible or a URL returning HTTP 200 is not enough.
 ## 7. Immediate next action
 
 Complete the app-by-app repository and deployment audit (M1). That audit determines which products can be linked as-is, which need configuration repairs, which require a rebuild, and which should be archived after dependency review.
+
+
+## 8. Repository inventory — first-pass findings (18 November 2026)
+
+This review inspected repository README and package metadata through the connected GitHub account. It did **not** inspect every source file, deployment environment, Cloudflare resource, live domain or production database. Therefore, classifications below are source-repository findings, not production health claims.
+
+| Product / repository | Evidence found | First-pass classification | Required next action |
+|---|---|---|---|
+| Church Management — `amaechiu-del/domislink-church` | React + TypeScript + Vite frontend; Hono Worker API; D1/R2 stack; test, typecheck and build scripts; domain documented as `church.domislink.com` | **Keep and repair / verify** | Inspect latest CI, production Worker and Pages configuration, remote D1 migrations, secrets, then run sign-in, tenant-isolation and giving workflows |
+| Meet — `amaechiu-del/domislink-international` | Separate `apps/web` and `apps/api` workspaces; typecheck, API tests and deployment-config validation scripts; README explicitly says initial foundation and production setup required | **Keep; continue building** | Audit source completeness, tests and Cloudflare deployment configuration; do not label production-ready |
+| AI Studio — `amaechiu-del/domislink-ai-studio` | README and roadmap describe a deterministic prompt-planning prototype; explicitly says real generation, persistence, visual editor, Gemini, metering and deployment automation remain unverified | **Keep; prototype / build** | Compare progress tracker with source tree; implement the missing production capabilities milestone by milestone |
+| AI Business OS — `amaechiu-del/ai-business` | React/Vite frontend and Worker API workspaces, unit/security tests and staging preflight tooling; README says early implementation and identifies PocketBase | **Keep; architecture reconciliation required** | Resolve the documented PocketBase direction against the approved D1/R2 plan; inspect migration branch, auth, tenant isolation and deployed staging before production |
+| Aviation Safety Summit — `amaechiu-del/summit` | React 19/Vite app, Express server, file-based JSON persistence, Gemini and Paystack dependencies; summit date documented as 17 November 2026 | **Keep as event archive / assess** | Preserve summit records; assess whether it remains a live secretariat or becomes a read-only event archive; plan a durable data/backend migration before ongoing production use |
+| Air Ticketing — `amaechiu-del/flight-ticket` | README currently contains only a title | **Rebuild / investigate** | Check remaining files and any live deployment before deciding whether this is a reusable starter or a new build |
+| Store — `amaechiu-del/domislinkstore` | README was not found in this review | **Investigate** | Inspect repository contents, latest commits, actual build and deployment before linking |
+| Property — `amaechiu-del/-domislink-realestate` | README explicitly says “realestate app - to be built” | **Build required** | Do not link a user-facing production destination yet; create the real application foundation |
+| Webhook integration — `amaechiu-del/domislink-webhook` | README describes a general Node webhook receiver with HMAC/shared-secret verification and provider-neutral deployment options | **Keep as supporting infrastructure** | Review authentication, signature validation, replay/idempotency and deployment; do not list as an end-user app |
+| Static website — `amaechiu-del/domislink-www` | README describes a plain static landing page / PWA with GitHub Pages deployment | **Consolidate / compare** | Compare it with One Link and the existing `domislink-app` portal; identify canonical domain ownership and avoid maintaining multiple competing homepages |
+| `amaechiu-del/domislink-clean` | GitHub reports repository is empty | **Empty / candidate archive** | Confirm no external deployment or future purpose before archiving |
+| `amaechiu-del/dom islink-admin` | README lookup did not resolve in this pass | **Unverified** | Check exact repository identity and source content before assigning a role |
+
+### 8.1 Important corrections to the app directory
+
+- Air Ticketing now points its repository reference to `flight-ticket` and is labelled **Preparing for launch** because the available README is only a title.
+- Store now references the actual listed repository name `domislinkstore`; it remains **Preparing for launch** pending source review.
+- Property Marketplace is retained in the product roadmap but its destination is not exposed as an active link because the located repository says the app is still to be built.
+- AI Business OS uses its documented product URL `https://dabo.domislink.com`, but remains unverified and carries an explicit architecture-reconciliation warning.
+- The Summit remains represented as an event product, but its post-event role needs a decision and its current Express/file-based backend should not be treated as the approved long-term platform architecture.
+
+### 8.2 No destructive repository actions
+
+This first pass does not delete, archive, transfer or overwrite any product repository. A repository can appear unused while still holding production data, custom-domain configuration, deployment secrets, DNS dependencies or user records. Require a deployment/dependency check and backup plan before any destructive cleanup.
+
+### 8.3 Priority order from the audit
+
+1. **Church Management:** verify production and complete the first SSO pilot readiness review.
+2. **Meet:** complete its core foundation and safety/security implementation.
+3. **AI Business OS:** settle D1/R2 migration and authentication architecture before further production claims.
+4. **AI Studio:** move from planning prototype to real generation and deployment capabilities.
+5. **Summit:** preserve event data and decide archive versus ongoing secretariat.
+6. **Air Ticketing, Store and Property:** inspect remaining repository contents and rebuild where no usable application exists.
+7. **One Link / domislink-www:** consolidate to one canonical public entry point.
+
