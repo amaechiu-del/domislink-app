@@ -1,0 +1,25 @@
+{
+  "id": "/",
+  "name": "DomisLink One Link — Account & Apps",
+  "short_name": "One Link",
+  "description": "Installable DomisLink app launcher and personal account centre.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#090b12",
+  "theme_color": "#090b12",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": [
+    "business",
+    "productivity",
+    "utilities"
+  ]
+}

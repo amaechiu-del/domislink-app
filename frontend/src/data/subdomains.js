@@ -1,112 +1,20 @@
+// One Link app registry. "verify" means the destination is known but has not
+// passed a live health, sign-in, and authorization check. Never show it as live.
 export const subdomains = [
-  {
-    id: 1,
-    name: "Digital Empire",
-    subdomain: "digital-empire",
-    url: import.meta.env.VITE_DIGITAL_EMPIRE_URL || "https://digital-empire.domislink.com",
-    icon: "🛒",
-    category: "Ecommerce & Payments",
-    description:
-      "A full-featured ecommerce platform with integrated Paystack and Stripe payment processing, inventory management, and order tracking for modern online businesses.",
-    color: "#6366f1",
-  },
-  {
-    id: 2,
-    name: "AI Automation",
-    subdomain: "ai-automation",
-    url: import.meta.env.VITE_AI_AUTOMATION_URL || "https://ai-automation.domislink.com",
-    icon: "🤖",
-    category: "University Automation",
-    description:
-      "Intelligent automation tools built for universities — streamline admissions, student records, scheduling, financial processing, and staff management with AI-powered workflows.",
-    color: "#8b5cf6",
-  },
-  {
-    id: 3,
-    name: "CMS",
-    subdomain: "cms",
-    url: import.meta.env.VITE_CMS_URL || "https://cms.domislink.com",
-    icon: "📝",
-    category: "Content Management",
-    description:
-      "A powerful headless content management system for creating, organising, and publishing content across all your DomisLink applications from a single dashboard.",
-    color: "#ec4899",
-  },
-  {
-    id: 4,
-    name: "Analytics",
-    subdomain: "analytics",
-    url: import.meta.env.VITE_ANALYTICS_URL || "https://analytics.domislink.com",
-    icon: "📊",
-    category: "Data & Insights",
-    description:
-      "Real-time data analytics and reporting across all your subdomains. Track usage metrics, revenue, user behaviour, and system performance in one centralised view.",
-    color: "#f59e0b",
-  },
-  {
-    id: 5,
-    name: "API Portal",
-    subdomain: "api",
-    url: import.meta.env.VITE_API_URL || "https://api.domislink.com",
-    icon: "⚡",
-    category: "Developer Portal",
-    description:
-      "The central API gateway for the DomisLink ecosystem. Explore interactive documentation, manage API keys, monitor rate limits, and integrate with any service.",
-    color: "#10b981",
-  },
-  {
-    id: 6,
-    name: "Docs",
-    subdomain: "docs",
-    url: import.meta.env.VITE_DOCS_URL || "https://docs.domislink.com",
-    icon: "📚",
-    category: "Documentation Hub",
-    description:
-      "Comprehensive guides, tutorials, and API references for every DomisLink service. Get up and running quickly with step-by-step instructions and code examples.",
-    color: "#3b82f6",
-  },
-  {
-    id: 7,
-    name: "Dashboard",
-    subdomain: "dashboard",
-    url: import.meta.env.VITE_DASHBOARD_URL || "https://dashboard.domislink.com",
-    icon: "🎛️",
-    category: "Admin Control Panel",
-    description:
-      "The master administration panel for managing users, permissions, configurations, and system health across the entire DomisLink platform.",
-    color: "#14b8a6",
-  },
-  {
-    id: 8,
-    name: "Support",
-    subdomain: "support",
-    url: import.meta.env.VITE_SUPPORT_URL || "https://support.domislink.com",
-    icon: "🎧",
-    category: "Customer Support",
-    description:
-      "Integrated helpdesk and ticketing system. Submit support requests, browse the knowledge base, and get real-time assistance from the DomisLink support team.",
-    color: "#f97316",
-  },
-  {
-    id: 9,
-    name: "Blog",
-    subdomain: "blog",
-    url: import.meta.env.VITE_BLOG_URL || "https://blog.domislink.com",
-    icon: "✍️",
-    category: "News & Updates",
-    description:
-      "Stay up to date with the latest DomisLink product announcements, engineering deep-dives, industry insights, and tips for getting the most out of our platform.",
-    color: "#ef4444",
-  },
-  {
-    id: 10,
-    name: "Marketplace",
-    subdomain: "marketplace",
-    url: import.meta.env.VITE_MARKETPLACE_URL || "https://marketplace.domislink.com",
-    icon: "🏪",
-    category: "Services & Products",
-    description:
-      "Browse and purchase automation templates, integrations, and premium add-ons built by the DomisLink community. Extend your platform without writing a line of code.",
-    color: "#a855f7",
-  },
+  { id:"church", name:"Church Management", short:"Church", category:"Community", icon:"⛪", domain:"church.domislink.com", url:"https://church.domislink.com", description:"A multi-branch church operating system for members, attendance, ministry teams, events, giving, communications and reporting.", status:"verify", repo:"amaechiu-del/domislink-church" },
+  { id:"meet", name:"DomisLink Meet", short:"Meet", category:"Community", icon:"♡", domain:"meet.domislink.com", url:"https://meet.domislink.com", description:"A verified-identity, privacy-led platform for meaningful connections and safer date planning.", status:"verify", repo:"amaechiu-del/domislink-international" },
+  { id:"studio", name:"AI Studio", short:"AI Studio", category:"Productivity", icon:"✧", domain:"studio.domislink.com", url:"https://studio.domislink.com", description:"Plan, generate, edit and deploy full-stack applications with AI agents, GitHub and Cloudflare tools.", status:"verify", repo:"amaechiu-del/domislink-ai-studio" },
+  { id:"summit", name:"Aviation Safety Summit", short:"Summit", category:"Business", icon:"✈", domain:"summit.domislink.com", url:"https://summit.domislink.com", description:"The aviation safety summit information and secretariat portal, including stakeholder and RSVP workflows.", status:"verify", repo:"amaechiu-del/summit" },
+  { id:"tickets", name:"Air Ticketing", short:"Air Tickets", category:"Travel", icon:"◈", domain:"airticket.domislink.com", url:"https://airticket.domislink.com", description:"The DomisLink flight search and ticketing service. The available GitHub flight-ticket repository currently exposes only a minimal README; booking, search and payment workflows require implementation and verification.", status:"planned", repo:"amaechiu-del/flight-ticket" },
+  { id:"store", name:"DomisLink Store", short:"Store", category:"Business", icon:"▣", domain:"store.domislink.com", url:"https://store.domislink.com", description:"A digital storefront for products, services and business transactions. The repository named domislinkstore needs a source and deployment audit before this destination is advertised as usable.", status:"planned", repo:"amaechiu-del/domislinkstore" },
+  { id:"wa", name:"WhatsApp Business OS", short:"WhatsApp OS", category:"Business", icon:"◉", domain:"wa.domislinker.com", url:"https://wa.domislinker.com", description:"Customer conversations, business messaging, automation and communication workflows.", status:"verify", repo:null },
+  { id:"property", name:"Property Marketplace", short:"Property", category:"Business", icon:"⌂", domain:"propertymarketplace.domislinker.com", url:null, description:"A property discovery and marketplace experience for listings, enquiries and property services. The located repository is still labelled ‘to be built’; a production destination is not yet offered.", status:"planned", repo:"amaechiu-del/-domislink-realestate" },
+  { id:"practice", name:"Practice & Learning", short:"Practice", category:"Learning", icon:"▤", domain:"practice.domislinker.com", url:"https://practice.domislinker.com", description:"A learning and practice destination for guided exercises, revision and assessments.", status:"verify", repo:null },
+  { id:"business-os", name:"AI Business OS", short:"Business OS", category:"Productivity", icon:"⌘", domain:"dabo.domislink.com", url:"https://dabo.domislink.com", description:"A multi-tenant business operating system for customers, products, orders, invoices and payments. Its current repository README still documents PocketBase, which must be reconciled with the approved Cloudflare D1/R2 architecture before production.", status:"verify", repo:"amaechiu-del/ai-business" },
 ];
+
+export const statusLabels = {
+  verify: "Connection check pending",
+  planned: "Preparing for launch",
+  live: "Verified live",
+};

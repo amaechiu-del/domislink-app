@@ -3,108 +3,184 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta
-      name="description"
-      content="DomisLink — A unified platform of intelligent tools for ecommerce, automation, analytics, content management, and more."
-    />
-    <meta property="og:title" content="DomisLink — Your Digital Ecosystem" />
-    <meta
-      property="og:description"
-      content="Explore 10 powerful apps built on the DomisLink platform."
-    />
+    <meta name="theme-color" content="#090b12" />
+    <meta name="description" content="One Link is the unified gateway to the DomisLink digital ecosystem." />
+    <meta property="og:title" content="One Link — DomisLink" />
+    <meta property="og:description" content="One destination for your DomisLink apps, services and workspace." />
     <meta property="og:type" content="website" />
-    <meta name="theme-color" content="#6366f1" />
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔗</text></svg>" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="icon" href="/icon.svg" type="image/svg+xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-      rel="stylesheet"
-    />
-    <title>DomisLink — Your Digital Ecosystem</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
+    <title>One Link — DomisLink | The Digital Empire</title>
   </head>
   <body>
-    <!-- Navbar -->
-    <header role="banner">
-      <nav class="navbar" aria-label="Main navigation">
-        <div class="container navbar-inner">
-          <a href="/" class="logo" aria-label="DomisLink home">
-            <div class="logo-icon" aria-hidden="true">🔗</div>
-            DomisLink
-          </a>
-          <span class="nav-badge">Platform</span>
-        </div>
-      </nav>
-    </header>
+    <div class="site-shell">
+      <header class="topbar">
+        <a class="brand" href="/" aria-label="DomisLink One Link home">
+          <span class="brand-mark" aria-hidden="true">♛</span>
+          <span><strong>DomisLink</strong><small>THE DIGITAL EMPIRE</small></span>
+        </a>
+        <nav class="top-actions" aria-label="Main navigation">
+          <a class="nav-link" href="#apps">Explore apps</a>
+          <a class="nav-link" href="#identity">One identity</a>
+          <button id="install-button" class="install-button" type="button">Install app ↓</button>
+          <button id="open-account" class="account-open-button" type="button">My account ↗</button><span class="signin-soon" aria-label="Single sign-on is being prepared">One sign-in · coming soon</span>
+        </nav>
+      </header>
 
-    <main id="main-content">
-      <!-- Hero -->
-      <section class="hero" aria-labelledby="hero-title">
-        <div class="container">
-          <div class="hero-tag" role="status">Live Platform</div>
-          <h1 class="hero-title" id="hero-title">
-            Your Digital<br />
-            <span class="gradient-text">Ecosystem</span>
-          </h1>
-          <p class="hero-description">
-            DomisLink brings together 10 powerful applications — from ecommerce
-            and AI automation to analytics and content management — all on one
-            interconnected platform.
-          </p>
-          <div class="hero-stats" role="list" aria-label="Platform stats">
-            <div class="stat" role="listitem">
-              <div class="stat-value">10</div>
-              <div class="stat-label">Apps &amp; Services</div>
+      <main>
+        <section class="hero">
+          <div class="hero-copy">
+            <div class="eyebrow"><span class="eyebrow-dot"></span> THE DOMISLINK ECOSYSTEM</div>
+            <h1>Everything connected.<br /><span>One Link.</span></h1>
+            <p class="hero-lede">One destination for your business, community, learning and everyday digital tools. Find the right DomisLink app and move between services with less friction.</p>
+            <div class="hero-actions">
+              <a class="primary-action" href="#apps">Explore your apps <span aria-hidden="true">↗</span></a>
+              <span class="trust-note"><span aria-hidden="true">✦</span> Built for web and mobile</span>
             </div>
-            <div class="stat" role="listitem">
-              <div class="stat-value">1</div>
-              <div class="stat-label">Unified Platform</div>
-            </div>
-            <div class="stat" role="listitem">
-              <div class="stat-value">∞</div>
-              <div class="stat-label">Possibilities</div>
+            <div class="hero-metrics" aria-label="Portal overview">
+              <div><strong>01</strong><span>Central app directory</span></div>
+              <div><strong>SSO</strong><span>Unified identity roadmap</span></div>
+              <div><strong>PWA</strong><span>Installable experience</span></div>
             </div>
           </div>
-        </div>
-      </section>
-
-      <!-- Cards Section -->
-      <section class="section" aria-labelledby="apps-title">
-        <div class="container">
-          <div class="section-header">
-            <h2 class="section-title" id="apps-title">Explore the Platform</h2>
-            <p class="section-subtitle">
-              Click any card to visit the app. Each service is independently
-              deployed and ready to use.
-            </p>
+          <div class="hero-art" aria-label="Illustration of connected applications">
+            <div class="orbit orbit-one"></div><div class="orbit orbit-two"></div>
+            <div class="orbit-node node-one">✈</div><div class="orbit-node node-two">⌘</div><div class="orbit-node node-three">⛪</div><div class="orbit-node node-four">♡</div>
+            <div class="hub-card"><div class="hub-crown">♛</div><strong>ONE</strong><span>DOMISLINK</span><i>Connected services</i></div>
+            <div class="art-caption">ONE DIGITAL EMPIRE<br /><b>CONNECTED BY DESIGN</b></div>
           </div>
+        </section>
 
-          <div
-            id="cards-grid"
-            class="cards-grid"
-            role="list"
-            aria-label="DomisLink applications"
-          ></div>
-        </div>
-      </section>
-    </main>
+        <section class="apps-section" id="apps">
+          <div class="section-heading">
+            <div><div class="eyebrow">YOUR DIGITAL WORKSPACE</div><h2>Find your app</h2><p>Explore the services connected to the DomisLink ecosystem. Pin favourites and return to recently opened apps from this device.</p></div>
+            <span id="result-count" class="result-count"></span>
+          </div>
+          <label class="search-wrap"><span aria-hidden="true">⌕</span><input id="app-search" type="search" placeholder="Search apps, services or categories…" autocomplete="off" /><kbd>SEARCH</kbd></label>
+          <div id="app-views" class="app-views" role="group" aria-label="App launcher views"></div>
+          <div id="category-filters" class="category-filters" aria-label="Filter apps by category"></div>
+          <div id="apps-grid" class="apps-grid" aria-live="polite"></div>
+          <div id="empty-state" class="empty-state" hidden><strong>No matching apps</strong><span>Try another search or category.</span></div>
+          <p class="directory-note"><span aria-hidden="true">ⓘ</span> App destinations are listed for discovery. A “connection check pending” label means availability, sign-in and permissions have not yet been verified end to end.</p>
+        </section>
 
-    <!-- Footer -->
-    <footer role="contentinfo">
-      <div class="footer">
-        <div class="container">
-          <div class="footer-logo" aria-hidden="true">🔗 DomisLink</div>
-          <p class="footer-text">
-            &copy; <span id="year"></span> DomisLink. All rights reserved. &nbsp;|&nbsp;
-            <a href="https://domislink.com">domislink.com</a>
-          </p>
-        </div>
+
+        <section class="account-centre" id="account-centre" hidden aria-labelledby="account-heading">
+          <div class="account-topline">
+            <button id="close-account" class="account-back" type="button">← Back to apps</button>
+            <span class="account-preview-label">ACCOUNT CENTRE · PREVIEW MODE</span>
+          </div>
+          <div class="account-heading-row">
+            <div><div class="eyebrow">YOUR DOMISLINK IDENTITY</div><h1 id="account-heading">Account Centre</h1><p>Manage your profile, preferences and connected services from one place.</p></div>
+            <div class="account-status">SSO connection pending</div>
+          </div>
+          <div class="account-profile-banner">
+            <div id="account-avatar" class="account-avatar">DL</div>
+            <div><h2 id="account-greeting">Your DomisLink account</h2><p id="account-save-state">Local preview · not connected to SSO</p></div>
+            <span class="preview-pill">LOCAL PREVIEW</span>
+          </div>
+          <div class="account-layout">
+            <nav class="account-nav" aria-label="Account sections">
+              <button type="button" data-account-tab="profile" aria-current="page"><span>◉</span> Profile</button>
+              <button type="button" data-account-tab="security" aria-current="false"><span>▣</span> Security & devices</button>
+              <button type="button" data-account-tab="connected" aria-current="false"><span>⌘</span> Connected apps</button>
+              <button type="button" data-account-tab="notifications" aria-current="false"><span>♧</span> Notifications</button>
+              <button type="button" data-account-tab="billing" aria-current="false"><span>◇</span> Subscriptions & billing</button>
+              <button type="button" data-account-tab="privacy" aria-current="false"><span>◈</span> Privacy & data</button>
+            </nav>
+            <div class="account-content">
+              <section data-account-panel="profile" class="account-panel">
+                <div class="account-panel-heading"><div><h2>Personal profile</h2><p>These details stay in this browser in preview mode.</p></div><span class="panel-preview">LOCAL ONLY</span></div>
+                <form id="account-profile-form" class="account-form">
+                  <label>Display name<input id="account-display-name" name="displayName" maxlength="80" autocomplete="name" placeholder="Enter your display name"></label>
+                  <label>Email address<input id="account-email" name="email" type="email" maxlength="254" autocomplete="email" placeholder="you@example.com"></label>
+                  <label>Phone number<input id="account-phone" name="phone" type="tel" maxlength="32" autocomplete="tel" placeholder="+234…"></label>
+                  <div class="account-form-grid">
+                    <label>Language<select id="account-language"><option>English</option><option>French</option><option>Portuguese</option></select></label>
+                    <label>Time zone<select id="account-timezone"><option value="Africa/Lagos">Lagos (WAT)</option><option value="UTC">UTC</option><option value="Europe/London">London</option><option value="America/New_York">New York</option></select></label>
+                  </div>
+                  <div class="account-form-footer"><span>Profile data is not yet synced to an identity server.</span><button class="primary-action" type="submit">Save profile</button></div>
+                </form>
+              </section>
+              <section data-account-panel="security" class="account-panel" hidden>
+                <h2>Security & devices</h2><p class="account-subtitle">Your central DomisLink sign-in is not connected yet.</p>
+                <div class="account-info-card"><strong>Single sign-on</strong><span class="security-wait">Gateway integration pending</span><p>When SSO is released, you will manage passkeys, sign-in methods and verified recovery options here.</p></div>
+                <div class="account-info-card"><strong>This browser</strong><span class="security-wait">Local preview only</span><p>This page has not registered an authenticated device session. No remote sessions are available to revoke.</p></div>
+                <div class="account-info-card"><strong>Sign-in protection</strong><p>Passkeys, OTP, Google identity linking and session revocation will appear after the identity gateway passes security validation.</p></div>
+              </section>
+              <section data-account-panel="connected" class="account-panel" hidden>
+                <h2>Connected applications</h2><p class="account-subtitle">Your One Link product directory and account identity will be connected progressively.</p>
+                <ul id="connected-apps-list" class="connected-apps-list"></ul>
+              </section>
+              <section data-account-panel="notifications" class="account-panel" hidden>
+                <div class="account-panel-heading"><div><h2>Message centre</h2><p>Your DomisLink notices in one place.</p></div><span id="notification-unread-count" class="panel-preview">3 unread</span></div>
+                <div class="notification-preview-banner">PREVIEW INBOX · EXAMPLE NOTICES ONLY · NO REAL MESSAGES ARE SENT</div>
+                <div class="notification-toolbar"><div class="notification-filters">
+                  <button type="button" data-notification-filter="all" aria-pressed="true">All</button>
+                  <button type="button" data-notification-filter="unread" aria-pressed="false">Unread</button>
+                  <button type="button" data-notification-filter="security" aria-pressed="false">Security</button>
+                  <button type="button" data-notification-filter="product" aria-pressed="false">Updates</button>
+                </div><button id="mark-all-notifications-read" class="mark-all-button" type="button">Mark all read</button></div>
+                <div id="notification-feed" class="notification-feed" aria-live="polite"></div>
+                <div id="notification-empty" class="billing-empty" hidden><strong>No notices in this view</strong><p>Try another message filter.</p></div>
+                <p class="notification-save-note">Read status is remembered on this browser only. Server-side messages and cross-device sync will be connected after SSO and messaging delivery are ready.</p>
+                <div class="account-panel-heading channels-heading"><div><h2>Delivery preferences</h2><p>Select which channels you would prefer when those services are connected.</p></div></div>
+                <div class="account-toggle-row"><div><strong>Email</strong><p>Account and product emails</p></div><input id="channel-email" type="checkbox" checked></div>
+                <div class="account-toggle-row"><div><strong>WhatsApp</strong><p>Approved WhatsApp templates and notices</p></div><input id="channel-whatsapp" type="checkbox"></div>
+                <div class="account-toggle-row"><div><strong>SMS</strong><p>Important alerts and verification messages</p></div><input id="channel-sms" type="checkbox" checked></div>
+                <div class="account-toggle-row"><div><strong>Push notifications</strong><p>Notifications from the installed One Link PWA</p></div><input id="channel-push" type="checkbox" checked></div>
+                <p id="notification-save-state" class="account-save-message">Preferences are saved on this device only.</p>
+              </section>
+              <section data-account-panel="billing" class="account-panel" hidden>
+                <h2>Subscriptions & billing</h2><p class="account-subtitle">A single view of eligible DomisLink subscriptions is planned.</p>
+                <div class="account-info-card"><strong>Payment connection</strong><span class="security-wait">Not connected</span><p>Paystack transactions, receipts, invoices and subscription renewals will appear here after verified account and payment integration.</p></div>
+                <div class="billing-empty"><span>◇</span><strong>No billing records in preview</strong><p>This preview does not access or invent payment history.</p></div>
+              </section>
+              <section data-account-panel="privacy" class="account-panel" hidden>
+                <h2>Privacy & data</h2><p class="account-subtitle">Understand what this preview stores on this device.</p>
+                <div class="account-info-card"><strong>Local profile preferences</strong><p>Display name, email, phone, language, time zone and notification preferences are saved in this browser only.</p></div>
+                <div class="account-info-card"><strong>What is not stored here</strong><p>Passwords, identity tokens, payment card data, authenticated sessions and private account records are not collected by this preview.</p></div>
+                <button id="reset-account-preview" class="danger-button" type="button">Reset local account preview</button>
+                <p id="privacy-reset-state" class="account-save-message">This only resets local Account Centre preview fields.</p>
+              </section>
+            </div>
+          </div>
+          <p class="account-disclaimer">Preview experience. This is not an authenticated account session. Changes made here are local to this browser and are not submitted to DomisLink servers.</p>
+        </section>
+\n        <section class="identity-section" id="identity">
+          <div class="identity-icon">♛</div>
+          <div><div class="eyebrow">ONE IDENTITY · MULTIPLE APPS</div><h2>One sign-in is the destination.</h2><p>The central identity gateway is being prepared. Until each app completes its SSO integration and security checks, use its current sign-in page. We will not claim a unified session is active before it is verified.</p></div>
+          <span class="identity-status">SSO integration pending</span>
+        </section>
+      </main>
+
+      <footer class="footer"><a class="footer-brand" href="/">♛ DOMISLINK</a><span>THE DIGITAL EMPIRE</span><small>© <span id="year"></span> DomisLink International Services Ltd. All rights reserved.</small></footer>
+    </div>
+
+    <dialog id="app-detail-dialog" class="detail-dialog" aria-labelledby="detail-title">
+      <button id="close-detail-dialog" class="dialog-close" type="button" aria-label="Close product details">×</button>
+      <div class="dialog-crown">♛</div>
+      <p id="detail-category" class="app-category"></p>
+      <div class="detail-title-row"><h2 id="detail-title"></h2><span id="detail-status" class="status-pill"></span></div>
+      <p id="detail-tagline" class="detail-tagline"></p>
+      <div class="detail-domain-row"><span>Product address</span><strong id="detail-domain"></strong></div>
+      <div class="detail-section"><h3>Designed for</h3><p id="detail-audience"></p></div>
+      <div class="detail-section"><h3>Key capabilities</h3><ul id="detail-features" class="detail-features"></ul></div>
+      <div class="detail-note"><strong>Readiness note</strong><p id="detail-next"></p></div>
+      <div class="detail-actions">
+        <a id="detail-open" class="primary-action" target="_blank" rel="noopener noreferrer">Open application ↗</a>
+        <a id="detail-repo" class="details-repo" target="_blank" rel="noopener noreferrer">View source repository ↗</a>
       </div>
-    </footer>
+    </dialog>
 
-    <script>
-      document.getElementById("year").textContent = new Date().getFullYear();
-    </script>
+    <dialog id="install-dialog" class="install-dialog">
+      <button id="close-install-dialog" class="dialog-close" type="button" aria-label="Close">×</button>
+      <div class="dialog-crown">♛</div><h2>Install One Link</h2>
+      <p>On your phone, open this page in your browser menu and choose <strong>Add to Home Screen</strong> or <strong>Install app</strong>. On desktop, use the install icon in your browser address bar when available.</p>
+    </dialog>
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>

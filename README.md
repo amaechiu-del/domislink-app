@@ -1,144 +1,75 @@
-# DomisLink App
+# DomisLink One Link
 
-A modern public landing page showcasing the 10 DomisLink subdomain applications as interactive, clickable cards.
+**One destination for the DomisLink digital ecosystem.**  
+Brand line: **The Digital Empire.**  
+Intended primary domain: `https://domislink.com` (deployment and DNS must be verified separately).
 
-## Overview
+One Link is the unified app directory and, over time, the identity gateway into DomisLink services. It is being prepared as a responsive, installable Progressive Web App (PWA).
 
-The **domislink-app** repository is the main public-facing site for the DomisLink platform. It features a responsive hero section and a grid of 10 clickable cards — one for each subdomain service.
+## Current scope in this repository
 
-### Featured Subdomains
+- A polished mobile-first app directory using the DomisLink gold / dark visual identity.
+- Search and category filtering across the known DomisLink products.
+- Personal app launcher views for All Apps, Pinned and Recent.
+- Device-local pinned favourites and a six-app recent history; no account or sensitive data is stored there.
+- Status-aware launch controls that disable products still marked Preparing for launch.
+- Automated Node.js tests for preference validation, local persistence, de-duplication and recent-list limits.
+- Registry-driven product cards with explicit verification states.
+- Product detail dialogs with target audience, capabilities, product address, readiness note and source repository.
+- Responsive Account Centre with local profile preferences, security/device status, connected-app overview, billing placeholder and privacy controls.
+- Local message inbox with all/unread/security/updates filters, read controls and unread counter.
+- Delivery preference controls for email, WhatsApp, SMS and push notifications (local preview only).
+- Installable PWA that can be added to a phone or desktop home screen.
+- Native PWA manifest, install prompt and an offline shell.
+- Product and technical integration plan in `docs/ONE_LINK_FOUNDATION.md`.
 
-| App | URL | Description |
-|-----|-----|-------------|
-| Digital Empire | digital-empire.domislink.com | Ecommerce & Payments |
-| AI Automation | ai-automation.domislink.com | University Automation |
-| CMS | cms.domislink.com | Content Management |
-| Analytics | analytics.domislink.com | Data & Insights |
-| API Portal | api.domislink.com | Developer Portal |
-| Docs | docs.domislink.com | Documentation Hub |
-| Dashboard | dashboard.domislink.com | Admin Control Panel |
-| Support | support.domislink.com | Customer Support |
-| Blog | blog.domislink.com | News & Updates |
-| Marketplace | marketplace.domislink.com | Services & Products |
+## Important status rules
 
----
+- **Connection check pending**: a product destination is known, but its production availability, sign-in, authorization and core workflows have not passed an end-to-end verification.
+- **Preparing for launch**: no production destination is confirmed.
+- **Verified live**: only use after a dated health check and successful sign-in / authorization / key workflow checks.
+- The presence of an app card is not evidence that the target app is deployed or working.
+- Unified SSO is a roadmap capability. Do not represent it as active until the central gateway and each relying application complete the integration tests.
 
-## Tech Stack
+## Technology
 
-- **Frontend**: HTML5, CSS3, Vanilla JavaScript with [Vite](https://vitejs.dev/)
-- **Backend**: Node.js (placeholder, ready to extend)
-- **Deployment**: [Render](https://render.com) via `render.yaml`
+- Vite and vanilla JavaScript.
+- Static assets and native browser PWA APIs; no third-party PWA runtime is required.
+- Designed for Cloudflare Pages hosting. Confirm Pages build settings and custom-domain routing before production cutover.
+- The identity gateway is expected to use OpenID Connect authorization-code flow with PKCE and Cloudflare Workers / D1 according to the architecture document.
 
----
-
-## Local Development
-
-### Prerequisites
-
-- Node.js 18+
-- npm 9+
-
-### Frontend
+## Local development
 
 ```bash
 cd frontend
 npm install
 npm run dev
+npm test
+npm run build
+npm run preview
 ```
 
-The dev server starts at `http://localhost:5173`.
+## Deployment target
 
-### Backend
+- Repository: `amaechiu-del/domislink-app`
+- Branch for this preparation: `feature/one-link-unified-portal`
+- Intended public URL: `https://domislink.com`
+- Hosting: Cloudflare Pages (target; not asserted as configured by this change).
 
-```bash
-cd backend
-npm install
-npm start
-```
+Configure the Pages project with the repository, the intended production branch, build command `npm install && npm run build`, and output directory `dist` (working directory `frontend`). Verify DNS, TLS, redirects, caching headers and rollback before switching production traffic. Do not deploy this feature branch to the production domain.
 
----
+## Product registry
 
-## Environment Variables
+Edit `frontend/src/data/subdomains.js`. Each entry includes an app id, name, category, domain, URL, description, status and optional repository. Use `status: "verify"` until a live test proves the app works. Never add credentials or private API keys to this file.
 
-Copy `.env.example` to `.env` and fill in your values:
+## Next work
 
-```bash
-cp .env.example .env
-```
+1. Audit each target repository and deployed URL; record evidence and date.
+2. Establish the central SSO gateway at `sso.domislink.com`.
+3. Integrate one relying app at a time using OIDC + PKCE, tenant-aware authorization and server-side token validation.
+4. Add account linking, passkeys / WebAuthn and recovery flows after the base SSO path passes tests.
+5. Add account-synchronised favourites after SSO is complete.
+6. Test all app journeys on mobile, desktop and installed PWA before production release.
 
-All `VITE_*` variables are embedded at build time and control the URLs each subdomain card links to.
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `VITE_DIGITAL_EMPIRE_URL` | https://digital-empire.domislink.com | Digital Empire subdomain URL |
-| `VITE_AI_AUTOMATION_URL` | https://ai-automation.domislink.com | AI Automation subdomain URL |
-| `VITE_CMS_URL` | https://cms.domislink.com | CMS subdomain URL |
-| `VITE_ANALYTICS_URL` | https://analytics.domislink.com | Analytics subdomain URL |
-| `VITE_API_PORTAL_URL` | https://api.domislink.com | API Portal subdomain URL |
-| `VITE_DOCS_URL` | https://docs.domislink.com | Docs subdomain URL |
-| `VITE_DASHBOARD_URL` | https://dashboard.domislink.com | Dashboard subdomain URL |
-| `VITE_SUPPORT_URL` | https://support.domislink.com | Support subdomain URL |
-| `VITE_BLOG_URL` | https://blog.domislink.com | Blog subdomain URL |
-| `VITE_MARKETPLACE_URL` | https://marketplace.domislink.com | Marketplace subdomain URL |
-
----
-
-## Deployment on Render
-
-The `render.yaml` file configures automatic deployment for both services.
-
-### Steps
-
-1. Fork or push this repository to GitHub.
-2. Log in to [Render](https://render.com) and create a new **Blueprint** by pointing at this repo.
-3. Render will auto-detect `render.yaml` and provision:
-   - **domislink-frontend** — Static site built with Vite, served from `frontend/dist`
-   - **domislink-backend** — Node.js web service from the `backend/` directory
-4. Add your environment variables in the Render dashboard (use `.env.example` as a reference).
-5. Every push to `main` triggers an automatic re-deploy.
-
-### Build Details
-
-| Service | Root Dir | Build Command | Publish / Start |
-|---------|----------|---------------|-----------------|
-| Frontend | `frontend/` | `npm install && npm run build` | `dist/` (static) |
-| Backend | `backend/` | `npm install` | `npm start` |
-
----
-
-## Updating Subdomain Cards
-
-To add, remove, or edit cards, modify `frontend/src/data/subdomains.js`. Each entry supports:
-
-```js
-{
-  id: 1,
-  name: "Card Title",
-  subdomain: "subdomain-slug",
-  url: import.meta.env.VITE_MY_URL || "https://fallback.domislink.com",
-  icon: "🛒",           // emoji icon
-  category: "Category Label",
-  description: "Two or three sentence description of the service.",
-  color: "#6366f1",     // hex accent colour for the card
-}
-```
-
----
-
-## Project Structure
-
-```
-domislink-app/
-├── frontend/
-│   ├── index.html                  # HTML entry point
-│   ├── package.json                # Vite dev dependencies
-│   └── src/
-│       ├── main.js                 # App entry — renders cards
-│       ├── styles.css              # Full responsive stylesheet
-│       └── data/
-│           └── subdomains.js       # Subdomain card data
-├── backend/                        # Node.js backend (extend as needed)
-├── .env.example                    # Environment variable template
-├── render.yaml                     # Render deployment config
-└── README.md
-```
+See [docs/ONE_LINK_FOUNDATION.md](docs/ONE_LINK_FOUNDATION.md) for architecture, app audit and release gates.
+See [docs/PRODUCT_INTEGRATION_CONTRACT.md](docs/PRODUCT_INTEGRATION_CONTRACT.md) for the Church-led Universal SSO integration contract, multi-product tenant model and future app onboarding checklist.
