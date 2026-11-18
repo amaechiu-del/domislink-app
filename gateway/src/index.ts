@@ -278,23 +278,29 @@ export default {
     if (method === "POST" && url.pathname === "/oauth/token") {
       const form = await request.formData();
       const grantType = String(form.get("grant_type") ?? "");
-      const clientId = String(form.get("client_id") ?? "");
+      const authorization = request.headers.get("Authorization") ?? "";
+      const basic = /^Basic ([A-Za-z0-9+/=]+)$/.exec(authorization);
+      let basicClientId = "";
+      let basicClientSecret = "";
+      if (basic) {
+        try {
+          const credentials = new TextDecoder().decode(Uint8Array.from(atob(basic[1]),(character)=>character.charCodeAt(0)));
+          const separator = credentials.indexOf(":");
+          if (separator < 1) return json({error:"invalid_client"},401);
+          basicClientId = credentials.slice(0,separator);
+          basicClientSecret = credentials.slice(separator+1);
+        } catch { return json({error:"invalid_client"},401); }
+      }
+      const formClientId = String(form.get("client_id") ?? "");
+      if (basicClientId && formClientId && basicClientId !== formClientId) return json({error:"invalid_client"},401);
+      const clientId = basicClientId || formClientId;
       const client = await getClient(env,clientId);
       if (!client || grantType !== "authorization_code") return json({error:"invalid_client_or_grant"},400);
       const origin = request.headers.get("Origin");
       if (origin && !parseArray((client as ClientRow & {allowed_origins_json:string}).allowed_origins_json, []).includes(origin)) return json({error:"origin_not_allowed"},403);
       const cors = origin ? corsHeaders(origin) : {};
-      const authorization = request.headers.get("Authorization") ?? "";
       if (client.client_type === "confidential") {
-        const basic = /^Basic ([A-Za-z0-9+/=]+)$/.exec(authorization);
-        if (!basic || !client.client_secret_hash) return json({error:"invalid_client"},401,{"WWW-Authenticate":'Basic realm="DomisLink SSO"'});
-        let credentials = "";
-        try { credentials = new TextDecoder().decode(Uint8Array.from(atob(basic[1]),(character)=>character.charCodeAt(0))); } catch { return json({error:"invalid_client"},401); }
-        const separator = credentials.indexOf(":");
-        if (separator < 1) return json({error:"invalid_client"},401);
-        const suppliedId = credentials.slice(0,separator);
-        const suppliedSecret = credentials.slice(separator+1);
-        if (suppliedId !== client.client_id || !safeEqual(await sha256(suppliedSecret),client.client_secret_hash)) return json({error:"invalid_client"},401,{"WWW-Authenticate":'Basic realm="DomisLink SSO"'});
+        if (!basic || !client.client_secret_hash || !basicClientSecret || !safeEqual(await sha256(basicClientSecret),client.client_secret_hash)) return json({error:"invalid_client"},401,{"WWW-Authenticate":'Basic realm="DomisLink SSO"'});
       } else if (authorization) {
         return json({error:"invalid_client"},401);
       }
