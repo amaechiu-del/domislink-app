@@ -188,7 +188,7 @@ export default {
         grant_types_supported:["authorization_code"],
         subject_types_supported:["public"],
         id_token_signing_alg_values_supported:["RS256"],
-        token_endpoint_auth_methods_supported:["none"],
+        token_endpoint_auth_methods_supported:["none","client_secret_basic"],
         code_challenge_methods_supported:["S256"],
         scopes_supported:DEFAULT_SCOPES,
         claims_supported:["iss","sub","aud","exp","iat","nonce","email","email_verified"]
@@ -284,7 +284,20 @@ export default {
       const origin = request.headers.get("Origin");
       if (origin && !parseArray((client as ClientRow & {allowed_origins_json:string}).allowed_origins_json, []).includes(origin)) return json({error:"origin_not_allowed"},403);
       const cors = origin ? corsHeaders(origin) : {};
-      if (client.client_type === "confidential") return json({error:"confidential_client_authentication_not_configured"},401);
+      const authorization = request.headers.get("Authorization") ?? "";
+      if (client.client_type === "confidential") {
+        const basic = /^Basic ([A-Za-z0-9+/=]+)$/.exec(authorization);
+        if (!basic || !client.client_secret_hash) return json({error:"invalid_client"},401,{"WWW-Authenticate":'Basic realm="DomisLink SSO"'});
+        let credentials = "";
+        try { credentials = new TextDecoder().decode(Uint8Array.from(atob(basic[1]),(character)=>character.charCodeAt(0))); } catch { return json({error:"invalid_client"},401); }
+        const separator = credentials.indexOf(":");
+        if (separator < 1) return json({error:"invalid_client"},401);
+        const suppliedId = credentials.slice(0,separator);
+        const suppliedSecret = credentials.slice(separator+1);
+        if (suppliedId !== client.client_id || !safeEqual(await sha256(suppliedSecret),client.client_secret_hash)) return json({error:"invalid_client"},401,{"WWW-Authenticate":'Basic realm="DomisLink SSO"'});
+      } else if (authorization) {
+        return json({error:"invalid_client"},401);
+      }
       const code = String(form.get("code") ?? "");
       const redirectUri = String(form.get("redirect_uri") ?? "");
       const verifier = String(form.get("code_verifier") ?? "");
