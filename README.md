@@ -15,6 +15,7 @@ One Link is the unified app directory and, over time, the identity gateway into 
 - Status-aware launch controls that disable products still marked Preparing for launch.
 - Automated Node.js tests for preference validation, local persistence, de-duplication and recent-list limits.
 - Registry-driven product cards with explicit verification states.
+- Product detail dialogs with target audience, capabilities, product address, readiness note and source repository.
 - Native PWA manifest, install prompt and an offline shell.
 - Product and technical integration plan in `docs/ONE_LINK_FOUNDATION.md`.
 
