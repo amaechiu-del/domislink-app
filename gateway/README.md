@@ -7,20 +7,20 @@ This directory contains the first Worker/D1 issuer implementation for `https://s
 ## Implemented in this foundation
 
 - OIDC discovery document.
-- RS256 JWKS publication from a Worker signing-key secret.
+- RS256 ID-token signing and JWKS publication from separately configured private/public PEM keys.
 - D1-backed identity, verified-email metadata, password hashes, OIDC clients, SSO sessions, authorization codes and audit events.
 - Password login to an HttpOnly, Secure, host-only `__Host-` SSO cookie.
 - Authorization-code endpoint with exact registered redirect URI matching, mandatory PKCE S256, required state and nonce, short-lived one-time codes.
-- Token exchange for public PKCE clients, one-time code consumption and RS256 ID token issuance.
+- Token exchange for public PKCE clients, RFC 7636 S256 challenge verification, one-time code consumption and RS256 ID token issuance.\n- Hashed opaque access-token persistence, expiry, revocation and a minimal `/oauth/userinfo` endpoint.\n- One-time, database-backed login CSRF tokens in addition to exact Origin checking.
 - Local SSO logout and health endpoint.
 
 ## Not yet implemented / not launch-ready
 
 - Confidential OIDC client authentication.
-- Access-token issuance as an independently verifiable JWT or opaque introspection-backed token (the current access token field is a random placeholder and must not be relied on by applications).
+- Refresh tokens, token introspection and broader access-token claims.
 - UserInfo, refresh tokens, token revocation endpoint and RP-initiated GET logout semantics.
 - Self-service registration, email verification, password reset, MFA, WebAuthn/passkeys and Google identity federation.
-- Login CSRF token / authenticated device and recovery UX beyond exact Origin enforcement.
+- Authenticated-device and recovery UX beyond the initial one-time login CSRF and Origin enforcement.
 - Rate limiting, bot protection, anomaly detection, audit retention/rotation, key rotation automation and complete protocol/security test suite.
 - Production D1 resource creation, custom domain, secret configuration and monitoring.
 
@@ -31,7 +31,7 @@ This directory contains the first Worker/D1 issuer implementation for `https://s
 1. Create the D1 database named `domislink-sso-db` in the target Cloudflare account.
 2. Replace the placeholder `database_id` in `wrangler.jsonc` with the real database ID.
 3. Apply migrations: `npm run db:migrate:local`, test locally, then `npm run db:migrate:remote` only after reviewing the remote target.
-4. Generate an RSA private key (PKCS#8 PEM) and matching KID. Store the private key with `wrangler secret put OIDC_SIGNING_PRIVATE_KEY`; set `OIDC_SIGNING_KID` as a Worker variable. Never commit the private key.
+4. Generate a matching RSA private key (PKCS#8 PEM) and public key (SPKI PEM) with a stable KID. Store the private key using `wrangler secret put OIDC_SIGNING_PRIVATE_KEY`; configure the public key as `OIDC_SIGNING_PUBLIC_KEY` and the KID as `OIDC_SIGNING_KID`. Never commit either key into source control. The JWKS endpoint publishes only the public key.
 5. Configure `LOGIN_ALLOWED_ORIGINS` with an exact JSON array of trusted One Link origins.
 6. Provision identities and public clients using reviewed, audited admin scripts/SQL; never enable public client self-registration.
 7. Run typecheck, unit, protocol, negative and end-to-end tests before connecting any app.
