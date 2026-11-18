@@ -171,10 +171,10 @@ function renderApps() {
   resultCount.textContent = `${visible.length} shown · ${subdomains.length} total apps`;
   emptyState.hidden = visible.length !== 0;
 
-  if (activeView === "pinned") {
+  if (baseApps.length === 0 && activeView === "pinned") {
     emptyTitle.textContent = "No pinned apps yet";
     emptyDescription.textContent = "Use the star on an app card to add it to your favourites.";
-  } else if (activeView === "recent") {
+  } else if (baseApps.length === 0 && activeView === "recent") {
     emptyTitle.textContent = "No recently opened apps";
     emptyDescription.textContent = "Apps you open will appear here for quick access.";
   } else {
