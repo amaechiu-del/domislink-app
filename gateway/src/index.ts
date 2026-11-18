@@ -29,7 +29,7 @@ interface CodeRow {
 
 const encoder = new TextEncoder();
 const COOKIE = "__Host-dl_sso";
-const DEFAULT_SCOPES = ["openid", "profile", "email"];
+const DEFAULT_SCOPES = ["openid", "email"];
 
 function json(data: unknown, status = 200, headers: HeadersInit = {}) {
   const h = new Headers(headers);
@@ -262,8 +262,39 @@ export default {
       const identity = await env.DB.prepare("SELECT status FROM identities WHERE id=?").bind(codeRow.identity_id).first<{status:string}>();
       if (identity?.status !== "active") return json({error:"invalid_grant"},400);
       const idToken = await issueIdToken(env,codeRow.identity_id,clientId,codeRow.nonce,codeRow.scope.split(" "));
+      const accessToken = randomToken();
+      const accessTtl = 300;
+      await env.DB.prepare("INSERT INTO access_tokens (id,token_hash,identity_id,client_id,scope,expires_at) VALUES (?,?,?,?,?,?)")
+        .bind(crypto.randomUUID(),await sha256(accessToken),codeRow.identity_id,clientId,codeRow.scope,new Date(Date.now()+accessTtl*1000).toISOString()).run();
       await audit(env,"token_exchange","success",codeRow.identity_id,clientId);
-      return json({id_token:idToken,scope:codeRow.scope});
+      return json({access_token:accessToken,token_type:"Bearer",expires_in:accessTtl,id_token:idToken,scope:codeRow.scope});
+    }
+
+    if (method === "GET" && url.pathname === "/oauth/userinfo") {
+      const authorization = request.headers.get("Authorization") ?? "";
+      const match = /^Bearer ([A-Za-z0-9_-]{40,128})$/.exec(authorization);
+      if (!match) return json({error:"invalid_token"},401,{"WWW-Authenticate":"Bearer"});
+      const tokenHash = await sha256(match[1]);
+      const token = await env.DB.prepare("SELECT identity_id,client_id,scope FROM access_tokens WHERE token_hash=? AND revoked_at IS NULL AND expires_at>? LIMIT 1")
+        .bind(tokenHash,new Date().toISOString()).first<{identity_id:string;client_id:string;scope:string}>();
+      if (!token) return json({error:"invalid_token"},401,{"WWW-Authenticate":"Bearer"});
+      const scopes = token.scope.split(/\\s+/);
+      const claims: Record<string,unknown> = {sub:token.identity_id};
+      if (scopes.includes("email")) {
+        const email = await env.DB.prepare("SELECT email_normalized,verified_at FROM identity_emails WHERE identity_id=? AND is_primary=1 LIMIT 1")
+          .bind(token.identity_id).first<{email_normalized:string;verified_at:string|null}>();
+        if (email) { claims.email=email.email_normalized; claims.email_verified=Boolean(email.verified_at); }
+      }
+      return json(claims);
+    }
+
+    if (method === "POST" && url.pathname === "/oauth/revoke") {
+      const form = await request.formData();
+      const tokenValue = String(form.get("token") ?? "");
+      if (!tokenValue) return new Response(null,{status:200,headers:{"Cache-Control":"no-store"}});
+      await env.DB.prepare("UPDATE access_tokens SET revoked_at=? WHERE token_hash=?")
+        .bind(new Date().toISOString(),await sha256(tokenValue)).run();
+      return new Response(null,{status:200,headers:{"Cache-Control":"no-store"}});
     }
 
     if (method === "POST" && url.pathname === "/oauth/logout") {
