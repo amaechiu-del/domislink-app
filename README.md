@@ -39,6 +39,7 @@ One Link is the unified app directory and, over time, the identity gateway into 
 cd frontend
 npm install
 npm run dev
+npm test
 npm run build
 npm run preview
 ```
@@ -62,6 +63,7 @@ Edit `frontend/src/data/subdomains.js`. Each entry includes an app id, name, cat
 2. Establish the central SSO gateway at `sso.domislink.com`.
 3. Integrate one relying app at a time using OIDC + PKCE, tenant-aware authorization and server-side token validation.
 4. Add account linking, passkeys / WebAuthn and recovery flows after the base SSO path passes tests.
-5. Test all app journeys on mobile, desktop and installed PWA before production release.
+5. Add account-synchronised favourites after SSO is complete.
+6. Test all app journeys on mobile, desktop and installed PWA before production release.
 
 See [docs/ONE_LINK_FOUNDATION.md](docs/ONE_LINK_FOUNDATION.md) for architecture, app audit and release gates.
