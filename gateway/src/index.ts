@@ -48,6 +48,12 @@ async function sha256(value: string): Promise<string> {
   const hash = await crypto.subtle.digest("SHA-256", encoder.encode(value));
   return Array.from(new Uint8Array(hash), (b) => b.toString(16).padStart(2, "0")).join("");
 }
+async function pkceS256(value: string): Promise<string> {
+  const hash = new Uint8Array(await crypto.subtle.digest("SHA-256", encoder.encode(value)));
+  let binary = "";
+  for (const byte of hash) binary += String.fromCharCode(byte);
+  return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+}
 function cookie(value: string, maxAge: number) {
   return `${COOKIE}=${encodeURIComponent(value)}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${maxAge}`;
 }
@@ -71,8 +77,13 @@ function safeEqual(a: string, b: string) {
   return diff === 0;
 }
 function allowedLoginOrigins(env: Env): string[] {
-  try { return JSON.parse(env.LOGIN_ALLOWED_ORIGINS ?? '["https://domislink.com"]'); }
-  catch { return ["https://domislink.com"]; }
+  let configured: string[] = [];
+  try {
+    const parsed = JSON.parse(env.LOGIN_ALLOWED_ORIGINS ?? '["https://domislink.com"]');
+    if (Array.isArray(parsed)) configured = parsed.filter((value) => typeof value === "string");
+  } catch { configured = ["https://domislink.com"]; }
+  try { configured.push(new URL(env.ISSUER_URL).origin); } catch { /* invalid issuer is caught during deployment review */ }
+  return [...new Set(configured)];
 }
 function loginOriginAllowed(request: Request, env: Env) {
   const origin = request.headers.get("Origin");
@@ -254,7 +265,7 @@ export default {
       const candidate = await env.DB.prepare(`SELECT id,client_id,identity_id,redirect_uri,scope,nonce,code_challenge,code_challenge_method
         FROM authorization_codes WHERE code_hash=? AND client_id=? AND redirect_uri=? AND consumed_at IS NULL AND expires_at>? LIMIT 1`)
         .bind(await sha256(code),clientId,redirectUri,new Date().toISOString()).first<CodeRow & {id:string}>();
-      if (!candidate || candidate.code_challenge_method !== "S256" || !safeEqual(await sha256(verifier),candidate.code_challenge)) {
+      if (!candidate || candidate.code_challenge_method !== "S256" || !safeEqual(await pkceS256(verifier),candidate.code_challenge)) {
         await audit(env,"token_exchange","denied",undefined,clientId);
         return json({error:"invalid_grant"},400);
       }
