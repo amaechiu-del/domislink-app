@@ -160,6 +160,7 @@ function showAppDetails(appId) {
   const status = detailDialog.querySelector("#detail-status");
   const tagline = detailDialog.querySelector("#detail-tagline");
   const audience = detailDialog.querySelector("#detail-audience");
+  const domain = detailDialog.querySelector("#detail-domain");
   const featureList = detailDialog.querySelector("#detail-features");
   const next = detailDialog.querySelector("#detail-next");
   const openLink = detailDialog.querySelector("#detail-open");
@@ -171,6 +172,7 @@ function showAppDetails(appId) {
   status.textContent = statusLabels[app.status] ?? "Status unknown";
   tagline.textContent = details.tagline;
   audience.textContent = details.audience;
+  domain.textContent = app.domain ?? "Production address not confirmed";
   featureList.replaceChildren(...details.features.map((feature) => {
     const item = document.createElement("li");
     item.textContent = feature;
