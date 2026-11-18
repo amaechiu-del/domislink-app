@@ -1,6 +1,7 @@
 import "./styles.css";
 import { subdomains, statusLabels } from "./data/subdomains.js";
 import { getAppDetails } from "./data/app-details.js";
+import { readAccount, saveAccount, DEFAULT_ACCOUNT } from "./data/account-preferences.js";
 import {
   readAppPreferences,
   writeAppPreferences,
@@ -20,6 +21,9 @@ const year = document.querySelector("#year");
 const installButton = document.querySelector("#install-button");
 const installDialog = document.querySelector("#install-dialog");
 const detailDialog = document.querySelector("#app-detail-dialog");
+const accountCentre = document.querySelector("#account-centre");
+const accountStorage = getStorage();
+let accountData = readAccount(accountStorage);
 const appIds = subdomains.map((app) => app.id);
 let activeCategory = "All";
 let activeView = "all";
@@ -121,6 +125,12 @@ function createAppCard(app) {
   const description = document.createElement("p");
   description.className = "app-description";
   description.textContent = app.description;
+
+  const detailButton = document.createElement("button");
+  detailButton.type = "button";
+  detailButton.className = "details-button";
+  detailButton.textContent = "View details";
+  detailButton.addEventListener("click", () => showAppDetails(app.id));
 
   const footer = document.createElement("div");
   footer.className = "app-card-footer";
@@ -237,6 +247,110 @@ function renderApps() {
     emptyDescription.textContent = "Try another search or category.";
   }
 }
+
+
+function setAccountTab(tabId) {
+  document.querySelectorAll("[data-account-panel]").forEach((panel) => {
+    panel.hidden = panel.dataset.accountPanel !== tabId;
+  });
+  document.querySelectorAll("[data-account-tab]").forEach((button) => {
+    button.setAttribute("aria-current", button.dataset.accountTab === tabId ? "page" : "false");
+  });
+}
+
+function renderAccountCentre() {
+  const name = document.querySelector("#account-display-name");
+  const email = document.querySelector("#account-email");
+  const phone = document.querySelector("#account-phone");
+  const language = document.querySelector("#account-language");
+  const timezone = document.querySelector("#account-timezone");
+  const avatar = document.querySelector("#account-avatar");
+  const title = document.querySelector("#account-greeting");
+  const saved = document.querySelector("#account-save-state");
+
+  name.value = accountData.displayName;
+  email.value = accountData.email;
+  phone.value = accountData.phone;
+  language.value = accountData.language;
+  timezone.value = accountData.timezone;
+  const initials = accountData.displayName.trim().split(/\\s+/).filter(Boolean).slice(0,2).map((part)=>part[0].toUpperCase()).join("");
+  avatar.textContent = initials || "DL";
+  title.textContent = accountData.displayName ? `Welcome, ${accountData.displayName}` : "Your DomisLink account";
+  saved.textContent = "Local preview · not connected to SSO";
+  for (const key of ["security","product","announcements"]) {
+    document.querySelector(`#notify-${key}`).checked = accountData.notifications[key];
+  }
+
+  const connected = document.querySelector("#connected-apps-list");
+  connected.replaceChildren(...subdomains.map((app) => {
+    const li = document.createElement("li");
+    const label = document.createElement("span");
+    label.textContent = app.name;
+    const state = document.createElement("small");
+    state.textContent = app.status === "planned" ? "Preparing" : "Not linked";
+    li.append(label,state);
+    return li;
+  }));
+}
+
+function openAccountCentre() {
+  document.querySelector(".hero").hidden = true;
+  document.querySelector("#apps").hidden = true;
+  document.querySelector("#identity").hidden = true;
+  accountCentre.hidden = false;
+  renderAccountCentre();
+  setAccountTab("profile");
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function closeAccountCentre() {
+  accountCentre.hidden = true;
+  document.querySelector(".hero").hidden = false;
+  document.querySelector("#apps").hidden = false;
+  document.querySelector("#identity").hidden = false;
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+document.querySelector("#open-account").addEventListener("click", openAccountCentre);
+document.querySelector("#close-account").addEventListener("click", closeAccountCentre);
+document.querySelectorAll("[data-account-tab]").forEach((button) => {
+  button.addEventListener("click", () => setAccountTab(button.dataset.accountTab));
+});
+
+document.querySelector("#account-profile-form").addEventListener("submit", (event) => {
+  event.preventDefault();
+  accountData = {
+    ...accountData,
+    displayName: document.querySelector("#account-display-name").value,
+    email: document.querySelector("#account-email").value,
+    phone: document.querySelector("#account-phone").value,
+    language: document.querySelector("#account-language").value,
+    timezone: document.querySelector("#account-timezone").value,
+  };
+  if (saveAccount(accountStorage,accountData)) {
+    renderAccountCentre();
+    document.querySelector("#account-save-state").textContent = "Saved on this device";
+  } else {
+    document.querySelector("#account-save-state").textContent = "Local storage unavailable; changes were not saved";
+  }
+});
+
+for (const key of ["security","product","announcements"]) {
+  document.querySelector(`#notify-${key}`).addEventListener("change",(event) => {
+    accountData.notifications[key] = event.target.checked;
+    const ok = saveAccount(accountStorage,accountData);
+    document.querySelector("#notification-save-state").textContent = ok
+      ? "Notification preferences saved on this device"
+      : "Local storage unavailable; preference was not saved";
+  });
+}
+
+document.querySelector("#reset-account-preview").addEventListener("click", () => {
+  accountData = { ...DEFAULT_ACCOUNT, notifications: { ...DEFAULT_ACCOUNT.notifications } };
+  saveAccount(accountStorage,accountData);
+  renderAccountCentre();
+  document.querySelector("#privacy-reset-state").textContent = "Local account preview data reset";
+});
 
 search.addEventListener("input", renderApps);
 renderApps();
