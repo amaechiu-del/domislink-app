@@ -168,3 +168,55 @@ These are planned URI examples. They must be registered exactly when the corresp
 ## 10. Release safety
 
 This review did not change Church files, execute Wrangler, apply a D1 migration, configure secrets, deploy Workers, connect a live account or modify production authentication. The current Church SSO release gate remains authoritative until all listed evidence is complete.
+
+
+## 11. Additional findings from the Church adapter review
+
+### Public client token model
+
+The reviewed issuer advertises `token_endpoint_auth_methods_supported: ["none"]` and the Church OIDC client is a public client protected by PKCE S256. Do not invent or embed a client secret in One Link or other browser bundles. Keep state, nonce and verifier handling per the OIDC client contract. The One Link portal should use a backend-for-frontend session so access/refresh tokens are not persisted in browser localStorage. If confidential clients are introduced later, the issuer must explicitly support and test a secure client-authentication method before any app depends on it.
+
+### Church adapter's current multi-church limitation
+
+The reviewed Church `/api/auth/sso/exchange` implementation currently retrieves the first active Church membership for a user (`ORDER BY created_at ASC LIMIT 1`). The staff-assignment code on the main branch also rejects adding an account that already has an active membership in another church. This is a current application policy, not a general identity limitation.
+
+Future readiness work should introduce a server-validated workspace selection flow:
+1. Exchange the central identity and create a short-lived pending/local session, without silently choosing a tenant.
+2. Return only the active workspaces that the authenticated user is actually a member of.
+3. Let the user choose a Church workspace; the server re-checks active membership, church status, branch context and role before issuing the selected local session.
+4. Keep Church roles local to the selected church; do not copy a global identity role into a tenant role.
+5. Support switching only by re-validating membership and rotating/replacing the local session. Never accept a raw `church_id` from the browser without membership validation.
+
+The same pattern should be used by other products with multiple businesses, schools, teams or workspaces. A central user may have several `platform_tenant_memberships`; a product must ask which authorized workspace to enter where its user experience requires a choice.
+
+### Origin and callback policy
+
+The reviewed SSO source contains an automatic HTTPS `*.domislink.com` origin acceptance rule in addition to configured origins. For broader ecosystem onboarding, use exact, reviewed app origins bound to each enabled OIDC client wherever possible. A valid registered redirect URI and an allowed browser origin are separate checks. Do not automatically trust every future subdomain merely because it ends in `.domislink.com`; verify custom-domain ownership, DNS, TLS, application security and lifecycle/decommissioning before client registration.
+
+### One Link PWA delivery model
+
+One Link is currently a static Vite PWA with browser-local preferences and no authenticated server session. For real Account Centre data, introduce a small Cloudflare Worker/BFF for One Link:
+- registered OIDC callback at `https://domislink.com/sso/callback`;
+- single-use state/nonce/PKCE transaction stored server-side with a short expiry;
+- server-side token exchange and signature/claim validation;
+- app-specific HttpOnly, Secure, SameSite cookie for the One Link session;
+- encrypted/short-lived server-side token handling if refresh is required;
+- profile reads from UserInfo and future account APIs server-to-server;
+- session list/revoke, notification preferences and linked-app data from authenticated APIs, not from localStorage.
+
+The PWA may continue storing non-sensitive view preferences (pins, recent apps, theme) locally. Do not persist ID/access/refresh tokens, verified contact credentials or payment details in localStorage or the service-worker cache.
+
+## 12. Future integration onboarding checklist
+
+For each new product, create a short integration PR and complete all of these before issuing a client:
+- [ ] Product owner and canonical GitHub repository identified.
+- [ ] Product tenant/resource ID model documented.
+- [ ] Exact HTTPS callback route exists and rejects unsolicited callbacks.
+- [ ] State, nonce and PKCE S256 handled; callback validates issuer, audience, expiry and signature.
+- [ ] Product backend creates its own HttpOnly session and does not expose tokens to browser storage.
+- [ ] SSO client ID, scopes and exact origins are registered and approved.
+- [ ] Product's own user/tenant/role/branch authorization is enforced for every protected API.
+- [ ] Multi-workspace selection and switching are explicit where users may hold multiple memberships.
+- [ ] Local logout and central logout/revocation are tested.
+- [ ] Security tests, cross-tenant negative tests, recovery tests and deployment rollback evidence are attached.
+- [ ] App directory status remains “Connection check pending” until live sign-in and a representative workflow pass.
