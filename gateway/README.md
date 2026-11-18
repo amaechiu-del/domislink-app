@@ -1,3 +1,5 @@
+> **Architecture notice — non-canonical prototype (18 November 2026).** A review of `amaechiu-del/domislink-church` found an existing, substantially more complete Universal SSO implementation under `services/sso/`, including its own issuer, OIDC clients, OTP, passkeys and shared tenant registry. This `gateway/` folder was created as an exploratory development prototype before that Church implementation was discovered. Do not deploy it, register production clients against it, or apply its migration files. The integration direction is documented in the One Link repository's `docs/PRODUCT_INTEGRATION_CONTRACT.md`. Reconcile and validate the Church SSO candidate as the canonical issuer before adding One Link or other products.
+
 # DomisLink SSO Gateway — foundation
 
 This directory contains the first Worker/D1 issuer implementation for `https://sso.domislink.com`.
