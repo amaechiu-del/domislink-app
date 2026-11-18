@@ -185,3 +185,29 @@ npm run verify:apps
 ```
 
 The script `scripts/check-app-endpoints.mjs` checks each registry URL that is not marked planned. It records the HTTP response, host, elapsed time and final URL. A timeout or DNS failure is reported as unreachable from that machine/network only. An HTTP response is not authentication or application acceptance evidence; complete the sign-in, role/tenant and representative workflow checks separately. The command does not change product readiness labels or deploy anything.
+
+
+## 11. App launcher milestone — favourites and recent apps
+
+The One Link portal now includes three device-local launcher views:
+- **All apps:** the complete registered product directory.
+- **Pinned:** products the visitor has starred for quick access.
+- **Recent:** the six most recently opened eligible apps, newest first.
+
+Preferences are stored in local browser storage under a versioned, product-specific key. Only registered app IDs are accepted; unknown values, malformed JSON and blocked storage are handled safely. No passwords, identity tokens, user profile data, payment information or tenant records are stored in this preference store. This state is device/browser-local and is not synchronised across devices until authenticated account preferences are implemented after SSO.
+
+Products marked **Preparing for launch** do not expose a clickable launch action, even when an intended URL is present in the registry. They remain discoverable with a clear “Launch coming soon” state.
+
+Automated Node.js tests cover sanitization, invalid storage, persistence, pin/unpin behavior, recency ordering, deduplication, list limits and rejection of unregistered app IDs. The frontend production build now runs these tests before Vite builds the static bundle.
+
+### Launcher acceptance checklist
+
+- [x] All Apps / Pinned / Recent views.
+- [x] Pin and unpin actions with accessible names and pressed states.
+- [x] Local, versioned preference persistence with safe fallback.
+- [x] Recent history limited to six apps and deduplicated.
+- [x] Planned applications cannot be launched from the directory.
+- [x] Unit tests added and run in an isolated Node.js 22 test harness: 6 passing.
+- [ ] Full dependency install and Vite production build in GitHub Actions.
+- [ ] Browser test on desktop, Android and installed PWA.
+- [ ] Account-synchronised preferences after the central identity integration is production-ready.
