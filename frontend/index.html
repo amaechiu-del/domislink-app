@@ -116,11 +116,23 @@
                 <ul id="connected-apps-list" class="connected-apps-list"></ul>
               </section>
               <section data-account-panel="notifications" class="account-panel" hidden>
-                <h2>Notification preferences</h2><p class="account-subtitle">Preview preferences are stored on this device. No messages are sent from this screen.</p>
-                <div class="account-toggle-row"><div><strong>Security notices</strong><p>Sign-in, account and security alerts</p></div><input id="notify-security" type="checkbox" checked></div>
-                <div class="account-toggle-row"><div><strong>Product updates</strong><p>New features and important product changes</p></div><input id="notify-product" type="checkbox" checked></div>
-                <div class="account-toggle-row"><div><strong>Announcements</strong><p>DomisLink news and service announcements</p></div><input id="notify-announcements" type="checkbox"></div>
-                <p id="notification-save-state" class="account-save-message">Changes save on this device.</p>
+                <div class="account-panel-heading"><div><h2>Message centre</h2><p>Your DomisLink notices in one place.</p></div><span id="notification-unread-count" class="panel-preview">3 unread</span></div>
+                <div class="notification-preview-banner">PREVIEW INBOX · EXAMPLE NOTICES ONLY · NO REAL MESSAGES ARE SENT</div>
+                <div class="notification-toolbar"><div class="notification-filters">
+                  <button type="button" data-notification-filter="all" aria-pressed="true">All</button>
+                  <button type="button" data-notification-filter="unread" aria-pressed="false">Unread</button>
+                  <button type="button" data-notification-filter="security" aria-pressed="false">Security</button>
+                  <button type="button" data-notification-filter="product" aria-pressed="false">Updates</button>
+                </div><button id="mark-all-notifications-read" class="mark-all-button" type="button">Mark all read</button></div>
+                <div id="notification-feed" class="notification-feed" aria-live="polite"></div>
+                <div id="notification-empty" class="billing-empty" hidden><strong>No notices in this view</strong><p>Try another message filter.</p></div>
+                <p class="notification-save-note">Read status is remembered on this browser only. Server-side messages and cross-device sync will be connected after SSO and messaging delivery are ready.</p>
+                <div class="account-panel-heading channels-heading"><div><h2>Delivery preferences</h2><p>Select which channels you would prefer when those services are connected.</p></div></div>
+                <div class="account-toggle-row"><div><strong>Email</strong><p>Account and product emails</p></div><input id="channel-email" type="checkbox" checked></div>
+                <div class="account-toggle-row"><div><strong>WhatsApp</strong><p>Approved WhatsApp templates and notices</p></div><input id="channel-whatsapp" type="checkbox"></div>
+                <div class="account-toggle-row"><div><strong>SMS</strong><p>Important alerts and verification messages</p></div><input id="channel-sms" type="checkbox" checked></div>
+                <div class="account-toggle-row"><div><strong>Push notifications</strong><p>Notifications from the installed One Link PWA</p></div><input id="channel-push" type="checkbox" checked></div>
+                <p id="notification-save-state" class="account-save-message">Preferences are saved on this device only.</p>
               </section>
               <section data-account-panel="billing" class="account-panel" hidden>
                 <h2>Subscriptions & billing</h2><p class="account-subtitle">A single view of eligible DomisLink subscriptions is planned.</p>
