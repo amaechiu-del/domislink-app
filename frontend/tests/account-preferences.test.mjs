@@ -32,3 +32,21 @@ test("saves only allowlisted local account preferences", () => {
   assert.equal(saved.displayName, "Member");
   assert.equal("password" in saved, false);
 });
+
+test("stores only allowlisted delivery channels", () => {
+  const account = normaliseAccount({
+    channels: { email: false, whatsapp: true, sms: false, push: true, telegram: true },
+  });
+  assert.deepEqual(account.channels, { email: false, whatsapp: true, sms: false, push: true });
+  assert.equal("telegram" in account.channels, false);
+});
+
+test("preserves local channel preferences when saved", () => {
+  const store = storageMock();
+  assert.equal(saveAccount(store, {
+    displayName: "Member",
+    channels: { email: true, whatsapp: true, sms: false, push: false },
+  }), true);
+  const saved = JSON.parse(store.getItem(ACCOUNT_PREFERENCES_KEY));
+  assert.deepEqual(saved.channels, { email: true, whatsapp: true, sms: false, push: false });
+});
