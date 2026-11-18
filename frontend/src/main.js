@@ -2,6 +2,7 @@ import "./styles.css";
 import { subdomains, statusLabels } from "./data/subdomains.js";
 import { getAppDetails } from "./data/app-details.js";
 import { readAccount, saveAccount, DEFAULT_ACCOUNT } from "./data/account-preferences.js";
+import { readNotificationState, saveNotificationState, markNotificationRead, markAllNotificationsRead, filterNotifications } from "./data/notifications.js";
 import {
   readAppPreferences,
   writeAppPreferences,
@@ -24,6 +25,8 @@ const detailDialog = document.querySelector("#app-detail-dialog");
 const accountCentre = document.querySelector("#account-centre");
 const accountStorage = getStorage();
 let accountData = readAccount(accountStorage);
+let notificationState = readNotificationState(accountStorage);
+let activeNotificationFilter = "all";
 const appIds = subdomains.map((app) => app.id);
 let activeCategory = "All";
 let activeView = "all";
@@ -282,7 +285,8 @@ function renderAccountCentre() {
   }
 
   const connected = document.querySelector("#connected-apps-list");
-  connected.replaceChildren(...subdomains.map((app) => {
+  renderNotificationCentre();
+\n  connected.replaceChildren(...subdomains.map((app) => {
     const li = document.createElement("li");
     const label = document.createElement("span");
     label.textContent = app.name;
@@ -293,7 +297,63 @@ function renderAccountCentre() {
   }));
 }
 
-function openAccountCentre() {
+
+function renderNotificationCentre() {
+  const count = document.querySelector("#notification-unread-count");
+  const list = document.querySelector("#notification-feed");
+  if (!count || !list) return;
+  const unread = filterNotifications("unread",notificationState).length;
+  count.textContent = `${unread} unread`;
+  const items = filterNotifications(activeNotificationFilter,notificationState);
+  list.replaceChildren(...items.map((item) => {
+    const card = document.createElement("article");
+    card.className = `notification-card ${notificationState.read.includes(item.id) ? "is-read" : "is-unread"}`;
+    const meta = document.createElement("div");
+    meta.className = "notification-card-meta";
+    const type = document.createElement("span");
+    type.textContent = item.label;
+    const example = document.createElement("span");
+    example.textContent = "EXAMPLE";
+    meta.append(type,example);
+    const title = document.createElement("h3");
+    title.textContent = item.title;
+    const message = document.createElement("p");
+    message.textContent = item.message;
+    const footer = document.createElement("div");
+    footer.className = "notification-card-footer";
+    const state = document.createElement("span");
+    state.textContent = notificationState.read.includes(item.id) ? "Read on this device" : "Unread";
+    const action = document.createElement("button");
+    action.type = "button";
+    action.textContent = notificationState.read.includes(item.id) ? "Read" : "Mark as read";
+    action.disabled = notificationState.read.includes(item.id);
+    action.addEventListener("click",() => {
+      notificationState = markNotificationRead(notificationState,item.id);
+      saveNotificationState(accountStorage,notificationState);
+      renderNotificationCentre();
+    });
+    footer.append(state,action);
+    card.append(meta,title,message,footer);
+    return card;
+  }));
+  document.querySelector("#notification-empty").hidden = items.length !== 0;
+}
+
+document.querySelectorAll("[data-notification-filter]").forEach((button) => {
+  button.addEventListener("click",() => {
+    activeNotificationFilter = button.dataset.notificationFilter;
+    document.querySelectorAll("[data-notification-filter]").forEach((item) => {
+      item.setAttribute("aria-pressed",String(item === button));
+    });
+    renderNotificationCentre();
+  });
+});
+document.querySelector("#mark-all-notifications-read").addEventListener("click",() => {
+  notificationState = markAllNotificationsRead(notificationState);
+  saveNotificationState(accountStorage,notificationState);
+  renderNotificationCentre();
+});
+\nfunction openAccountCentre() {
   document.querySelector(".hero").hidden = true;
   document.querySelector("#apps").hidden = true;
   document.querySelector("#identity").hidden = true;
@@ -345,7 +405,17 @@ for (const key of ["security","product","announcements"]) {
   });
 }
 
-document.querySelector("#reset-account-preview").addEventListener("click", () => {
+
+for (const key of ["email","whatsapp","sms","push"]) {
+  document.querySelector(`#channel-${key}`).addEventListener("change",(event) => {
+    accountData.channels[key] = event.target.checked;
+    const ok = saveAccount(accountStorage,accountData);
+    document.querySelector("#notification-save-state").textContent = ok
+      ? "Channel preferences saved on this device; delivery is not connected"
+      : "Local storage unavailable; preference was not saved";
+  });
+}
+\ndocument.querySelector("#reset-account-preview").addEventListener("click", () => {
   accountData = { ...DEFAULT_ACCOUNT, notifications: { ...DEFAULT_ACCOUNT.notifications } };
   saveAccount(accountStorage,accountData);
   renderAccountCentre();
