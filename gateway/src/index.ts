@@ -1,4 +1,4 @@
-import { SignJWT, exportJWK, importPKCS8 } from "jose";
+import { SignJWT, exportJWK, importPKCS8, importSPKI } from "jose";
 
 interface Env {
   DB: D1Database;
@@ -8,6 +8,7 @@ interface Env {
   AUTH_CODE_TTL_SECONDS?: string;
   OIDC_SIGNING_PRIVATE_KEY?: string;
   OIDC_SIGNING_KID?: string;
+  OIDC_SIGNING_PUBLIC_KEY?: string;
   LOGIN_ALLOWED_ORIGINS?: string;
 }
 
@@ -97,10 +98,10 @@ async function getClient(env: Env, clientId: string) {
   return env.DB.prepare("SELECT * FROM oidc_clients WHERE client_id=? AND status='active' LIMIT 1")
     .bind(clientId).first<ClientRow>();
 }
-function loginPage(returnTo: string, error = "") {
+function loginPage(returnTo: string, csrfToken: string, error = "") {
   const escaped = returnTo.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
   const message = error ? "<p class='error'>Sign-in failed. Check your details and try again.</p>" : "";
-  return new Response(`<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><meta name="color-scheme" content="dark"><title>DomisLink Sign in</title><style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#090b12;color:#f8f5ee;font:15px system-ui}.card{width:min(390px,calc(100% - 40px));padding:32px;border:1px solid #66502c;border-radius:20px;background:#151a25;box-sizing:border-box}.crown{color:#e8bd68;font-size:38px}h1{font-size:24px;margin:12px 0}p{color:#aab2c1;line-height:1.6}label{display:block;margin:18px 0 7px;font-size:12px}input{box-sizing:border-box;width:100%;padding:13px;border:1px solid #384154;border-radius:9px;background:#0d111b;color:white}button{width:100%;padding:14px;margin-top:22px;border:0;border-radius:9px;background:#e8bd68;color:#15120c;font-weight:800}.error{color:#ffb2a8}</style><main class="card"><div class="crown">♛</div><h1>Sign in to DomisLink</h1><p>Use your DomisLink identity to continue securely.</p>${message}<form method="post" action="/login"><input type="hidden" name="return_to" value="${escaped}"><label for="email">Email address</label><input id="email" name="email" type="email" autocomplete="username" required maxlength="254"><label for="password">Password</label><input id="password" name="password" type="password" autocomplete="current-password" required maxlength="128><button type="submit">Continue</button></form></main></html>`, { headers: { "Content-Type":"text/html; charset=utf-8", "Cache-Control":"no-store", "Content-Security-Policy":"default-src 'none'; style-src 'unsafe-inline'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'", "X-Frame-Options":"DENY", "Referrer-Policy":"no-referrer" } });
+  return new Response(`<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><meta name="color-scheme" content="dark"><title>DomisLink Sign in</title><style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#090b12;color:#f8f5ee;font:15px system-ui}.card{width:min(390px,calc(100% - 40px));padding:32px;border:1px solid #66502c;border-radius:20px;background:#151a25;box-sizing:border-box}.crown{color:#e8bd68;font-size:38px}h1{font-size:24px;margin:12px 0}p{color:#aab2c1;line-height:1.6}label{display:block;margin:18px 0 7px;font-size:12px}input{box-sizing:border-box;width:100%;padding:13px;border:1px solid #384154;border-radius:9px;background:#0d111b;color:white}button{width:100%;padding:14px;margin-top:22px;border:0;border-radius:9px;background:#e8bd68;color:#15120c;font-weight:800}.error{color:#ffb2a8}</style><main class="card"><div class="crown">♛</div><h1>Sign in to DomisLink</h1><p>Use your DomisLink identity to continue securely.</p>${message}<form method="post" action="/login"><input type="hidden" name="return_to" value="${escaped}"><input type="hidden" name="csrf_token" value="${csrfToken}"><label for="email">Email address</label><input id="email" name="email" type="email" autocomplete="username" required maxlength="254"><label for="password">Password</label><input id="password" name="password" type="password" autocomplete="current-password" required maxlength="128"><button type="submit">Continue</button></form></main></html>`, { headers: { "Content-Type":"text/html; charset=utf-8", "Cache-Control":"no-store", "Content-Security-Policy":"default-src 'none'; style-src 'unsafe-inline'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'", "X-Frame-Options":"DENY", "Referrer-Policy":"no-referrer" } });
 }
 async function verifyPassword(password: string, stored: string) {
   const [algorithm, rounds, saltText, hashText] = stored.split("$");
@@ -160,21 +161,21 @@ export default {
     }
 
     if (method === "GET" && url.pathname === "/oauth/jwks.json") {
-      if (!env.OIDC_SIGNING_PRIVATE_KEY || !env.OIDC_SIGNING_KID) return json({ error:"signing_key_not_configured" }, 503);
+      if (!env.OIDC_SIGNING_PUBLIC_KEY || !env.OIDC_SIGNING_KID) return json({ error:"public_signing_key_not_configured" }, 503);
       try {
-        const pem = env.OIDC_SIGNING_PRIVATE_KEY.replace(/-----BEGIN PRIVATE KEY-----|-----END PRIVATE KEY-----|\s/g, "");
-        const binary = atob(pem);
-        const der = Uint8Array.from(binary, c => c.charCodeAt(0));
-        const privateKey = await crypto.subtle.importKey("pkcs8", der, {name:"RSASSA-PKCS1-v1_5",hash:"SHA-256"}, true, ["sign"]);
-        const publicKey = await crypto.subtle.exportKey("jwk", await crypto.subtle.exportKey("spki", privateKey).then(buf=>crypto.subtle.importKey("spki",buf,{name:"RSASSA-PKCS1-v1_5",hash:"SHA-256"},true,["verify"])));
-        return json({ keys:[{kty:publicKey.kty,n:publicKey.n,e:publicKey.e,use:"sig",alg:"RS256",kid:env.OIDC_SIGNING_KID}] });
-      } catch { return json({ error:"signing_key_invalid" }, 503); }
+        const publicKey = await importSPKI(env.OIDC_SIGNING_PUBLIC_KEY, "RS256");
+        const jwk = await exportJWK(publicKey);
+        return json({ keys:[{...jwk,use:"sig",alg:"RS256",kid:env.OIDC_SIGNING_KID}] });
+      } catch { return json({ error:"public_signing_key_invalid" }, 503); }
     }
 
     if (method === "GET" && url.pathname === "/login") {
       const returnTo = url.searchParams.get("return_to") ?? "/account";
       if (!returnTo.startsWith("/oauth/authorize?") || returnTo.startsWith("//") || returnTo.includes("\\") ) return json({ error:"invalid_return_to" }, 400);
-      return loginPage(returnTo);
+      const csrf = randomToken();
+      await env.DB.prepare("INSERT INTO login_csrf_tokens (id,token_hash,expires_at) VALUES (?,?,?)")
+        .bind(crypto.randomUUID(),await sha256(csrf),new Date(Date.now()+5*60*1000).toISOString()).run();
+      return loginPage(returnTo,csrf);
     }
 
     if (method === "POST" && url.pathname === "/login") {
@@ -183,7 +184,11 @@ export default {
       const email = String(form.get("email") ?? "").trim().toLowerCase();
       const password = String(form.get("password") ?? "");
       const returnTo = String(form.get("return_to") ?? "");
-      if (!returnTo.startsWith("/oauth/authorize?") || returnTo.startsWith("//") || returnTo.includes("\\") || !email || password.length > 128) return json({ error:"invalid_request" }, 400);
+      const csrf = String(form.get("csrf_token") ?? "");
+      if (!returnTo.startsWith("/oauth/authorize?") || returnTo.startsWith("//") || returnTo.includes("\\") || !email || password.length > 128 || !csrf) return json({ error:"invalid_request" }, 400);
+      const csrfRow = await env.DB.prepare("UPDATE login_csrf_tokens SET consumed_at=? WHERE token_hash=? AND consumed_at IS NULL AND expires_at>? RETURNING id")
+        .bind(new Date().toISOString(),await sha256(csrf),new Date().toISOString()).first<{id:string}>();
+      if (!csrfRow) return json({ error:"invalid_csrf_token" }, 403);
       const row = await env.DB.prepare(`SELECT i.id, p.password_hash FROM identities i
         JOIN identity_emails e ON e.identity_id=i.id
         JOIN identity_passwords p ON p.identity_id=i.id
@@ -191,7 +196,10 @@ export default {
       const valid = row ? await verifyPassword(password, row.password_hash) : false;
       if (!row || !valid) {
         await audit(env,"login","denied",row?.id);
-        return loginPage(returnTo,"invalid");
+        const retryCsrf = randomToken();
+        await env.DB.prepare("INSERT INTO login_csrf_tokens (id,token_hash,expires_at) VALUES (?,?,?)")
+          .bind(crypto.randomUUID(),await sha256(retryCsrf),new Date(Date.now()+5*60*1000).toISOString()).run();
+        return loginPage(returnTo,retryCsrf,"invalid");
       }
       const raw = randomToken();
       const ttl = seconds(env.SESSION_TTL_SECONDS,28800,86400);
@@ -255,7 +263,7 @@ export default {
       if (identity?.status !== "active") return json({error:"invalid_grant"},400);
       const idToken = await issueIdToken(env,codeRow.identity_id,clientId,codeRow.nonce,codeRow.scope.split(" "));
       await audit(env,"token_exchange","success",codeRow.identity_id,clientId);
-      return json({access_token:randomToken(),token_type:"Bearer",expires_in:300,id_token:idToken,scope:codeRow.scope});
+      return json({id_token:idToken,scope:codeRow.scope});
     }
 
     if (method === "POST" && url.pathname === "/oauth/logout") {
