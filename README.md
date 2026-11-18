@@ -72,3 +72,4 @@ Edit `frontend/src/data/subdomains.js`. Each entry includes an app id, name, cat
 6. Test all app journeys on mobile, desktop and installed PWA before production release.
 
 See [docs/ONE_LINK_FOUNDATION.md](docs/ONE_LINK_FOUNDATION.md) for architecture, app audit and release gates.
+See [docs/PRODUCT_INTEGRATION_CONTRACT.md](docs/PRODUCT_INTEGRATION_CONTRACT.md) for the Church-led Universal SSO integration contract, multi-product tenant model and future app onboarding checklist.
