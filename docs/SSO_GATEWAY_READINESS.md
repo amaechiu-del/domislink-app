@@ -3,7 +3,7 @@
 **Issuer target:** `https://sso.domislink.com`  
 **Protocol:** OpenID Connect (OIDC), OAuth 2.0 Authorization Code Flow with PKCE (S256)  
 **Identity RP ID target:** `domislink.com` for passkeys used on that domain  
-**Status:** Architecture prepared; gateway repository and deployed issuer not located in the connected GitHub inventories reviewed on 18 November 2026.
+**Status:** Development Worker/D1 foundation implemented in `gateway/` on branch `feature/sso-gateway-worker-foundation`; review is open in [PR #3](https://github.com/amaechiu-del/domislink-app/pull/3). No issuer is deployed. The original search did not locate a standalone gateway repository, so the development foundation is housed in the existing One Link repository until a dedicated repository decision is made.
 
 ## 1. Existing evidence
 
@@ -116,9 +116,15 @@ Do not put central issuer signing keys into the Church Worker. The Church app ne
 | SSO-5 | Add passkeys / WebAuthn and upstream Google identity | Recovery, origin/RP ID, device revocation and linking tests pass |
 | SSO-6 | Production rollout | Protected main deployment, monitoring, key rotation and rollback proven |
 
-## 9. Immediate blocking items
+## 9. Implementation now present in the repository
+
+The gateway foundation now includes OIDC discovery, RS256 ID-token signing, a JWKS endpoint using the configured public PEM key, D1 identity/client/session/authorization-code tables, PBKDF2 password verification, a host-only SSO cookie, one-time login CSRF records, exact redirect URI matching, required state/nonce and PKCE S256, short-lived opaque access-token storage, UserInfo, access-token revocation, browser-origin allowlisting, health check and audit events.
+
+This remains a development implementation, not a production identity service. Confidential-client authentication, refresh tokens, complete RP-initiated logout, rate limits/bot controls, email verification/recovery, WebAuthn, Google federation, automated protocol/security tests, Cloudflare D1 provisioning, key setup and production domain deployment remain outstanding. The current PR has no reported CI status yet; TypeScript and runtime behavior must be verified before any relying application integration.
+
+## 10. Immediate blocking items
 
 1. Confirm whether the earlier `domislink-sso-gateway` project lives under another GitHub account or workspace; it was not visible in the two connected account inventories checked.
-2. If no source exists, create a dedicated gateway repository using the Cloudflare Workers + D1 architecture, with production deployment withheld until the issuer security tests pass.
+2. Review and validate the development gateway in PR #3. Decide whether to keep it in the One Link monorepo or move it to a dedicated gateway repository after the first build and security checks pass.
 3. Confirm the canonical user/account model and first-party domain strategy across apps.
 4. Begin with Church as the first relying-party integration; do not modify its existing production authentication in advance of a tested migration.
