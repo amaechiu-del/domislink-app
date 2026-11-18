@@ -1,0 +1,8 @@
+node_modules/
+.wrangler/
+.dev.vars
+*.pem
+*.key
+.env
+.env.*
+!.dev.vars.example
