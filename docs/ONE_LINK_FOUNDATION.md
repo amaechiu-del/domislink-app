@@ -173,3 +173,15 @@ This first pass does not delete, archive, transfer or overwrite any product repo
 6. **Air Ticketing, Store and Property:** inspect remaining repository contents and rebuild where no usable application exists.
 7. **One Link / domislink-www:** consolidate to one canonical public entry point.
 
+
+
+### 8.4 Repeatable endpoint check
+
+Run from PowerShell or a terminal with outbound internet access:
+
+```powershell
+cd frontend
+npm run verify:apps
+```
+
+The script `scripts/check-app-endpoints.mjs` checks each registry URL that is not marked planned. It records the HTTP response, host, elapsed time and final URL. A timeout or DNS failure is reported as unreachable from that machine/network only. An HTTP response is not authentication or application acceptance evidence; complete the sign-in, role/tenant and representative workflow checks separately. The command does not change product readiness labels or deploy anything.
