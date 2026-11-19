@@ -1,5 +1,5 @@
 export const registry = Object.freeze({
-  church:{url:'https://church.domislink.com',status:'pending',verified:false,auth:'oidc',healthPath:'/'},
+  church:{url:'https://church.domislink.com',status:'pending',verified:false,auth:'church-session',plannedAuth:'oidc',healthPath:'/',sessionEndpoint:'/api/auth/me',loginPath:'/login'},
   'ai-business':{url:null,status:'repair',verified:false,auth:'oidc'},
   meet:{url:'https://meet.domislink.com',status:'pending',verified:false,auth:'oidc'},
   property:{url:'https://propertymarketplace.domislinker.com',status:'pending',verified:false,auth:'oidc'},
