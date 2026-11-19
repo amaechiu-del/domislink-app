@@ -1,0 +1,22 @@
+name: OneLink destination health (report only)
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '15 7 * * *'
+permissions:
+  contents: read
+jobs:
+  health:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check configured destinations without approving them
+        run: node scripts/verify-onelink-destinations.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: onelink-health-report
+          path: onelink-health-report.json
+          retention-days: 14
