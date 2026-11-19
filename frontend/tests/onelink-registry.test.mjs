@@ -1,0 +1,3 @@
+import { test } from 'node:test';import assert from 'node:assert/strict';import {registry,canLaunch,getLaunchUrl} from '../src/onelink-registry.js';
+test('all destinations fail closed until verified',()=>{for(const entry of Object.values(registry))assert.equal(getLaunchUrl(entry),null)});
+test('only verified live https allowlisted destinations launch',()=>{assert.equal(canLaunch({status:'live',verified:true,url:'https://church.domislink.com'}),true);for(const url of ['http://church.domislink.com','https://evil.example','https://church.domislink.com.evil.example','javascript:alert(1)'])assert.equal(canLaunch({status:'live',verified:true,url}),false);assert.equal(canLaunch({status:'repair',verified:true,url:'https://church.domislink.com'}),false)});
