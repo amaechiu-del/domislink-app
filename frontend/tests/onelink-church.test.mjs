@@ -1,0 +1,3 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';import {churchIntegration,churchLoginUrl} from '../src/onelink-church.js';
+test('Church uses separate session',()=>{assert.equal(churchIntegration.existingSessionCookie,'dl_church_session');assert.equal(churchIntegration.sessionEndpoint,'/api/auth/me');assert.equal(churchLoginUrl(),null)});
+test('Church handoff requires approved destination',()=>{assert.equal(churchLoginUrl({url:'https://church.domislink.com',status:'live',verified:true,loginPath:'/login'}),'https://church.domislink.com/login');assert.equal(churchLoginUrl({url:'https://phishing.example',status:'live',verified:true,loginPath:'/login'}),null)});
