@@ -21,8 +21,8 @@ jobs:
       - name: Install dependencies
         run: npm install --no-audit --no-fund
       - name: JavaScript syntax
-        run: node --check src/onelink.js && node --check src/onelink-registry.js && node --check public/onelink-sw.js && node --check vite.config.js
-      - name: Launch engine security tests\n        run: node --test tests/onelink-registry.test.mjs\n      - name: Production build
+        run: node --check src/onelink.js && node --check src/onelink-registry.js && node --check src/onelink-identity.js && node --check public/onelink-sw.js && node --check vite.config.js
+      - name: Launch engine security tests\n        run: node --test tests/onelink-registry.test.mjs tests/onelink-identity.test.mjs\n      - name: Production build
         run: npm run build
       - name: Verify PWA assets and entry points
         run: |
