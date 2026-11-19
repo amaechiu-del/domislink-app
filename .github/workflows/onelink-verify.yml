@@ -1,0 +1,34 @@
+name: OneLink PWA verification
+on:
+  pull_request:
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/onelink-verify.yml'
+  workflow_dispatch:
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+      - name: JavaScript syntax
+        run: node --check src/onelink.js && node --check public/onelink-sw.js && node --check vite.config.js
+      - name: Production build
+        run: npm run build
+      - name: Verify PWA assets and entry points
+        run: |
+          test -s dist/index.html
+          test -s dist/onelink.html
+          test -s dist/onelink.webmanifest
+          test -s dist/onelink-sw.js
+          test -s dist/onelink-icon.svg
+          node -e "const m=require('./dist/onelink.webmanifest'); if(m.display!=='standalone'||m.start_url!=='/onelink.html'||!m.icons?.length)process.exit(1)"
