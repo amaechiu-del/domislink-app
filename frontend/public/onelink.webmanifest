@@ -1,0 +1,18 @@
+{
+  "name": "DomisLink OneLink",
+  "short_name": "OneLink",
+  "description": "Your Digital Empire in one app",
+  "start_url": "/onelink.html",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f5f7fa",
+  "theme_color": "#101827",
+  "icons": [
+    {
+      "src": "/onelink-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
